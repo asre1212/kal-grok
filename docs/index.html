@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>kal-grok · Paper Trader</title>
+<meta name="description" content="Hypothetical Kalshi paper-trading dashboard">
+<meta name="theme-color" content="#0b0f17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="kal-grok">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="ptr">↓ Pull to refresh</div>
+<header>
+  <div class="brand"><span class="logo">K</span><div><h1>kal-grok</h1><small>PAPER TRADING · $100k simulated</small></div></div>
+  <button id="refresh" aria-label="Refresh">⟳</button>
+</header>
+<main id="app">
+  <section class="hero card">
+    <div class="label">Equity (mid-marked)</div>
+    <div id="equity" class="big">—</div>
+    <div id="pnlline" class="sub">—</div>
+    <div id="chart" class="chart"></div>
+    <div class="updated">Updated <span id="updated">—</span></div>
+  </section>
+  <section class="kpis" id="kpis"></section>
+  <nav class="tabs" id="tabs">
+    <button data-tab="positions" class="on">Positions</button>
+    <button data-tab="trades">Trades</button>
+    <button data-tab="strategies">Strategies</button>
+    <button data-tab="report">Weekly</button>
+    <button data-tab="run">Last run</button>
+  </nav>
+  <section id="tab-positions" class="tab on"></section>
+  <section id="tab-trades" class="tab"></section>
+  <section id="tab-strategies" class="tab"></section>
+  <section id="tab-report" class="tab"></section>
+  <section id="tab-run" class="tab"></section>
+  <footer>Hypothetical paper trading on public Kalshi data. No real orders, no real money. Not financial advice.</footer>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+# kal-grok — a hypothetical Kalshi paper-trading bot
+
+> **DISCLAIMER — PAPER TRADING ONLY.** This bot is a simulation. It reads Kalshi's *public*
+> market-data API, never uses Kalshi credentials, and **never places real orders**. The $100,000
+> bankroll is imaginary, fills are simulated, and results are hypothetical. Simulated performance
+> does not predict real results. Nothing here is financial advice.
+
+A multi-strategy prediction-market bot that starts with a simulated **$100,000**, takes a market
+snapshot every ~6–7 hours (GitHub Actions), trades on paper with conservative fills and Kalshi's real
+fee formula, settles positions when markets resolve, re-evaluates and reallocates capital among its
+strategies every week, and publishes everything to an installable iPhone PWA dashboard.
+
+## Repo layout
+
+```
+kalbot/
+  api.py            read-only client for https://api.elections.kalshi.com/trade-api/v2 (rate-limited, retries)
+  fees.py           Kalshi fee math (taker 0.07, maker 0.0175 on maker-fee series, series multiplier)
+  sizing.py         fractional Kelly for binary contracts + cap helpers
+  models.py         favorite-longshot calibration model, MAP logistic fit, Brier, temperature bucket probs
+  execution.py      orderbook walking fill simulator (buy at ask / sell at bid, depth-capped)
+  portfolio.py      cash, positions, realized/unrealized P&L, settlement, interest on idle cash
+  engine.py         risk manager + execution context shared by strategies
+  strategies/       pluggable strategies (one capital sleeve + trade log each)
+  history.py        rolling price history, calibration samples harvested from settlements
+  evaluate.py       weekly scoring, bandit reallocation, parameter tuning, weekly report
+  publish.py        writes docs/data/*.json for the dashboard
+  run.py            one full cycle (python -m kalbot.run)
+state/              bot state (portfolio.json, history.json.gz, calibration.json.gz, series_fees.json)
+docs/               PWA dashboard (GitHub Pages) + docs/data/*.json + docs/data/reports/
+tests/              pytest suite (fees, Kelly, arbitrage, settlement, models, live dry run)
+scripts/make_icons.py   regenerates the PNG app icons with Pillow
+.github/workflows/  trade.yml (every ~6-7h), weekly.yml (Sundays), pages.yml (deploy on your pushes)
+```
+
+## How a cycle works (`python -m kalbot.run`)
+
+1. **Snapshot** — pages through `/events?status=open&with_nested_markets=true` (≈21k events / ≈205k
+   markets) and keeps a *tradable universe* (two-sided quotes, 24h volume ≥ 20 or open interest ≥ 200,
+   closes within 120 days; full bucket sets kept for exhaustive events). Series fee settings
+   (`fee_type`, `fee_multiplier`) come from `/series`, cached daily.
+2. **Settle** — any held market that left the open universe is looked up via `/markets?tickers=…`;
+   `finalized`/`settled` markets pay $1/$0 by `result` (scalar results use `settlement_value_dollars`).
+3. **Mark** — positions are marked at the mid (fair value); the bid-side *liquidation value* is also
+   tracked and shown.
+4. **Trade** — strategies run their `manage()` (exits) then `run()` (entries) through the risk engine.
+   Orderbooks (`/markets/{ticker}/orderbook`) are fetched for candidates (≤250 per run).
+5. **Persist + publish** — compact state is saved and dashboard JSON is written to `docs/data/`.
+
+Prices on the API are now `*_dollars` strings (e.g. `yes_ask_dollars: "0.4200"`) and sizes are
+`*_fp`; the orderbook only lists **bids** — a YES ask at *p* is a NO bid at 1−*p*.
+
+## Strategies
+
+| Strategy | Idea | Math |
+|---|---|---|
+| `event_arb` | Mutually exclusive outcome sets. **NO basket**: buying NO on any *k* outcomes pays ≥ *k*−1, so whenever the YES **bids** sum to more than $1 (+fees) the basket is a locked profit. **YES basket**: only on provably exhaustive sets (contiguous integer buckets, e.g. temperature), when YES asks sum < $1 − fees. | Σ yes_bid − 1 − fees > min_profit |
+| `ladder_arb` | Cross-market consistency: in "above X" ladders P(>a) ≥ P(>b) for a<b. YES(>a)+NO(>b) pays ≥ $1 in every state, so if yes_bid(>b) > yes_ask(>a) + fees it's free money (mirror logic for "below X"). Grouped by ticker prefix + strike type + custom strike so different players/assets never mix. | 1 − ask_yes(a) − ask_no(b) − fees |
+| `longshot_fade` | Favorite-longshot bias: longshots are overpriced, favorites underpriced. Buys NO on cheap YES (≤ 20¢) and YES on mirror favorites, 2–60 days out. | logit p = α + β·logit(mid), β>1 |
+| `expiry_convergence` | Within 48h of expiry, near-certain favorites (≥ 85¢) still trade at a discount; buy the favorite and let time decay pull it to $1. | separate short-horizon α, β |
+| `momentum` / `mean_reversion` | Big snapshot-to-snapshot moves (z ≥ 1.5 vs the market's own volatility, ≥ 3¢): fair = mid + κ·Δmid. κ>0 follows, κ<0 fades. Positions exit after `hold` runs. | κ set weekly from pooled lag-1 autocorrelation of price changes |
+| `market_making` | Wide-spread markets (≥ 6¢): post bids 1¢ inside on both YES and NO; a YES+NO pair nets to $1 (Kalshi nets opposite positions), locking ≈ spread − 2¢. Inventory-skewed quoting. **Conservative fills**: only if the next snapshot shows the market *traded through* our price, and at most `fill_frac` × new volume. Maker fees applied on maker-fee series. | |
+| `weather_nws` | Kalshi daily-high temperature markets for 24 cities vs the free NWS forecast (`api.weather.gov`) at each settlement station. Forecast error ~ Normal(0, σ(lead)), with integer continuity correction; the model is **ensembled with the market mid** (weight learned weekly from Brier(model) vs Brier(market)). Same-day markets are skipped. | P(bucket) = Φ((cap+½−μ)/σ) − Φ((floor−½−μ)/σ) |
+
+### Fees (verified against Kalshi's fee schedule, Nov 2026)
+
+`fee = round_up(M × 0.07 × C × P × (1−P))` for takers; makers pay `M × 0.0175 × C × P × (1−P)`
+only on series with `fee_type = quadratic_with_maker_fees` (≈160 series), else 0. `M` is the series
+`fee_multiplier` (1 for most; 0.5 or 0 for a few). The schedule now rounds to a centicent; the bot
+rounds **up to the cent** per price level, which is slightly conservative. No settlement fees.
+
+### Risk & sizing
+
+* **Fractional Kelly (0.25×)** per trade: f* = (p − c)/(1 − c), where c = price + fee per contract,
+  applied to the strategy's own sleeve.
+* **Exposure caps** (fractions of total equity): 2.5% per market, 5% per event (8% for risk-free
+  baskets), 10% per series, 30% per category, plus each strategy's sleeve and a 5% cash reserve.
+  Event/series caps are the correlation-aware limits (outcomes of one event are highly correlated).
+* **Drawdown circuit breaker**: −15% from peak halves all sizes; −25% halts new directional trades
+  (arbitrage still allowed).
+* **No double-dipping**: a strategy never re-buys a market it already holds (a snapshot's displayed
+  liquidity can't be consumed twice); strategies never take opposite sides of the same market
+  (ensemble conflict guard).
+* **Fee-dominated trades skipped**: edge after fees must clear `min_edge` *and* fees can't exceed 50%
+  of gross edge. Edge is re-checked on the actual depth-walked average price.
+* **Conservative fills**: buys at the ask, sells at the bid, walking real displayed depth, never more
+  than displayed size, fees charged per level.
+
+## Weekly re-evaluation (`python -m kalbot.evaluate`, Sundays)
+
+For each strategy: weekly realized + mark-to-market P&L, return on sleeve, annualized Sharpe and
+Sortino (per-run returns), hit rate, Brier score and calibration gap on settled trades (and the
+market's own Brier for comparison), max drawdown.
+
+**Reallocation** blends *multiplicative weights* (w ← w·e^{η·score}, score = tanh(20·weekly return) +
+0.1·Sharpe, clipped to [−1, 1]) with *Thompson sampling* over Beta(1+wins, 1+losses) (its weight
+grows with evidence), then applies a 3% floor, 30% cap and 5% cash reserve. A strategy with two
+losing weeks in a row and a cumulative loss > 8% of its sleeve goes on **probation** (1% sleeve, keeps
+collecting evidence) and is reinstated when it recovers.
+
+**Tuning** (inside hard bounds): `min_edge` loosens 10% for profitable strategies and tightens 20%
+after losing weeks; the favorite-longshot curve (α, β) is refit by MAP logistic regression on
+settled markets harvested from the bot's own price history (short and long horizons separately);
+momentum/reversion κ is set from the pooled lag-1 autocorrelation; weather σ-scale tracks calibration
+and the model/market blend weight tracks relative Brier. A markdown + JSON report is written to
+`docs/data/reports/` and shown in the app.
+
+## Other profit levers implemented
+
+* Cross-market ladder consistency arbitrage (`ladder_arb`) and NO-basket arbitrage on any subset of a
+  mutually exclusive set.
+* Exhaustive-bucket YES baskets.
+* Interest on idle cash (assumed 3.5% APY, `CASH_APY` in `config.py`; set 0 to disable).
+* Fee-aware filtering, depth-aware limit prices, per-level fee rounding.
+* Signal ensembling (NWS model × market mid) and an opposite-side conflict guard across strategies.
+* Self-calibration: every settlement the bot observes improves its longshot/favorite model.
+* Pair netting for market making (YES+NO → $1) to recycle capital immediately.
+
+### Ideas considered but not implemented (and why)
+
+* **Cross-exchange arbitrage (Polymarket, PredictIt, sportsbooks)** — needs reliable contract
+  matching across venues and their resolution rules differ; easy to fool yourself in paper trading.
+* **Sports models (Elo / odds-feed consensus)** — free, reliable odds APIs need keys or have tight
+  quotas; may add later via The Odds API with a free key.
+* **Economic-release models (CPI, jobs) vs Cleveland Fed nowcasts** — feasible, but each series needs
+  bespoke parsing of strikes and rules; a good next strategy.
+* **Daily-low temperature markets** — NWS "overnight low" periods don't align cleanly with the
+  calendar-day low Kalshi settles on; skipped to avoid a systematic bias.
+* **Intraday trading / faster loop** — the user asked for 6–8 hour snapshots; faster loops would
+  better capture market-making and momentum but would also need websocket data.
+* **Selling (closing) arbitrage baskets early when they converge** — small gain, adds complexity;
+  baskets are held to settlement.
+
+## Run it locally
+
+```bash
+python -m pip install -r requirements.txt
+python -m pytest -q                 # includes a live read-only dry run (KALGROK_OFFLINE=1 to skip)
+python -m kalbot.run                # one paper cycle, updates state/ and docs/data/
+python -m kalbot.evaluate           # weekly review now
+python -m http.server -d docs 8000  # open http://localhost:8000
+```
+
+To start over: delete `state/*` and `docs/data/*.json` and run a cycle.
+
+## Deploy (GitHub Actions + Pages)
+
+1. Push to a GitHub repo named `kal-grok` (branch `main`).
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions** (the workflows deploy
+   `/docs`). Dashboard: `https://<user>.github.io/kal-grok/`.
+3. **Settings → Actions → General → Workflow permissions: Read and write**.
+4. Actions → *paper-trade cycle* → *Run workflow* once to kick things off.
+
+On iPhone: open the dashboard in **Safari → Share → Add to Home Screen**. It runs full-screen,
+works offline with the last data, and supports pull-to-refresh.
+
+Notes: GitHub may delay scheduled runs by several minutes at busy times, and disables schedules
+in repos with no activity for 60 days (the bot's own commits keep it active). Each cycle commits
+~100–200 KB of compact JSON; if the repo ever gets large, squash old history on a branch.
