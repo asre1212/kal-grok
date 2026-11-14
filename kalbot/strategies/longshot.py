@@ -91,7 +91,7 @@ class ExpiryConvergence(Strategy):
         for edge, m, side, p in cands:
             if n >= self.max_new or edge < P["min_edge"]:
                 break
-            if eng.take(self.name, m, side, p, P["min_edge"], note=f"exp<{P['max_hours']}h"):
+            if eng.take(self.name, m, side, p, P["min_edge"], note=f"exp<{P['max_hours']}h", urgent=True):
                 n += 1
 
     def tune(self, params, metrics, ctx):

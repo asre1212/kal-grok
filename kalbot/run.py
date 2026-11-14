@@ -17,6 +17,9 @@ from .publish import publish
 from .store import load_json, save_json
 from .strategies import build_strategies
 from .strategies.arbitrage import is_exhaustive_buckets
+from .exits import apply_exit_rules
+from .orders import process_resting
+from .variants import run_variants, settle_all, analysis
 
 S = config.STATE_DIR
 
@@ -38,10 +41,18 @@ def load_state():
         st["params"].setdefault(k, v)
         for pk, pv in v.items():
             st["params"][k].setdefault(pk, pv)
+    st.setdefault("main_rules", json_copy(config.DEFAULT_MAIN_RULES))
+    for b, w in config.DEFAULT_MAIN_RULES["bucket_weights"].items():
+        st["main_rules"]["bucket_weights"].setdefault(b, w)
     for k, w in config.INITIAL_ALLOCATION.items():
         st["allocation"].setdefault(k, config.ALLOC_FLOOR)
         st.setdefault("strategy_status", {}).setdefault(k, "active")
     return st
+
+
+def json_copy(o):
+    import json
+    return json.loads(json.dumps(o))
 
 
 def series_fee_info(client, force=False):
@@ -89,47 +100,6 @@ def build_universe(client, fee_info, now):
     return markets, meta, n_events, n_raw
 
 
-def settle_and_refresh(pf, client, markets, fee_info):
-    """Held markets missing from the universe: settle if finalized, else load quotes for marking."""
-    missing = sorted({p["ticker"] for p in pf.positions.values()} - set(markets))
-    settled = 0
-    if not missing:
-        return 0
-    info = client.markets_by_tickers(missing)
-    for t in missing:
-        m = info.get(t)
-        if not m:
-            continue
-        status, result = m.get("status"), (m.get("result") or "").lower()
-        if status in ("settled", "finalized") and result in ("yes", "no", "scalar", "void", "all_no", "all_yes"):
-            sv = m.get("settlement_value_dollars")
-            if result == "yes":
-                yv = 1.0
-            elif result == "no":
-                yv = 0.0
-            else:
-                try:
-                    yv = float(sv)
-                except (TypeError, ValueError):
-                    continue
-            for k in [k for k, p in pf.positions.items() if p["ticker"] == t]:
-                pf.settle(k, yv, result)
-                settled += 1
-        elif status != "active":
-            # closed / determined but not yet paid: mark at the known result if any, else hold last mark
-            if result in ("yes", "no"):
-                for p in pf.positions.values():
-                    if p["ticker"] == t:
-                        p["mark"] = p["bid"] = 1.0 if result == p["side"] else 0.0
-        else:
-            cm = compact_market(m, None, fee_info)
-            any_pos = next(p for p in pf.positions.values() if p["ticker"] == t)
-            cm.update({"e": any_pos["event"], "s": any_pos["series"], "cat": any_pos["cat"]})
-            cm["_held_only"] = True
-            markets[t] = cm
-    return settled
-
-
 def run_cycle(trade=True, client=None, verbose=True):
     t0 = time.time()
     client = client or KalshiPublic()
@@ -138,11 +108,16 @@ def run_cycle(trade=True, client=None, verbose=True):
     history = load_json(S / "history.json.gz", {})
     calibration = load_json(S / "calibration.json.gz", [])
     pf = Portfolio(state)
+    vstate = load_json(S / "variants.json.gz", {})
+    vpfs = [Portfolio(vs) for vs in vstate.values()]
 
     fee_info = series_fee_info(client)
     markets, meta, n_events, n_raw = build_universe(client, fee_info, now)
     state["_event_meta"] = meta
-    n_settled = settle_and_refresh(pf, client, markets, fee_info)
+    settled = settle_all([pf] + vpfs, client, markets, fee_info)
+    n_settled = settled.get(0, 0)
+    main_markets = {t: m for t, m in markets.items()
+                    if m.get("_held_only") or (m["close"] - now) / 86400 <= config.MAIN_MAX_DAYS}
 
     if state.get("last_run"):
         pf.accrue_interest(now - state["last_run"])
@@ -169,17 +144,21 @@ def run_cycle(trade=True, client=None, verbose=True):
             state["params"]["expiry_convergence"]["beta"] = round(min(hi, max(lo, b_s)), 3)
 
     state["_run_notes"] = {}
-    eng = Engine(state, pf, {t: m for t, m in markets.items()}, client=client,
-                 history=history, now=now)
+    shared = {}
+    rules = state["main_rules"]
+    eng = Engine(state, pf, dict(main_markets), client=client, history=history, now=now,
+                 shared=shared, rules=rules)
     strategies = build_strategies()
     if trade:
+        process_resting(eng)
+        apply_exit_rules(eng, rules.get("tp"), rules.get("sl"))
         for s in strategies:
             try:
                 s.manage(eng)
             except Exception as e:
                 eng.log.append(f"{s.name}: manage error {e!r}")
         eng.refresh_exposure()
-        tradable = {t: m for t, m in markets.items() if not m.get("_held_only")}
+        tradable = {t: m for t, m in main_markets.items() if not m.get("_held_only")}
         eng.markets = tradable
         eng.events.clear()
         for m in tradable.values():
@@ -193,16 +172,22 @@ def run_cycle(trade=True, client=None, verbose=True):
         if p["ticker"] in markets:
             pf.mark(k, markets[p["ticker"]])
 
-    # history / calibration
+    # shadow variants (expiry bucket x exit rule), same snapshot + shared orderbook cache
+    vsum = run_variants(vstate, markets, state, meta, client, history, now, shared, strategies,
+                        trade=trade, last_run=state.get("last_run"))
+
+    # history / calibration (main universe only, so the main book's inputs are unchanged)
+    main_markets = {t: m for t, m in main_markets.items() if not m.get("_held_only")}
     held = {p["ticker"] for p in pf.positions.values()}
     try:
-        n_cal = harvest_calibration(history, {t: m for t, m in markets.items() if not m.get("_held_only")},
-                                    client, calibration, now)
+        n_cal = harvest_calibration(history, main_markets, client, calibration, now)
     except Exception as e:
         n_cal = 0
         print("calibration harvest failed:", e)
-    update_history(history, {t: m for t, m in markets.items() if not m.get("_held_only")}, held, now)
+    update_history(history, main_markets, held, now)
 
+    cd = pf.p.get("cooldown") or {}
+    pf.p["cooldown"] = {t: ts for t, ts in cd.items() if now - ts < 2 * config.EXIT_COOLDOWN_HOURS * 3600}
     equity = pf.equity()
     pf.p["peak_equity"] = max(pf.p["peak_equity"], equity)
     state["equity_curve"].append({"ts": int(now), "equity": round(equity, 2), "cash": round(pf.cash, 2),
@@ -226,12 +211,17 @@ def run_cycle(trade=True, client=None, verbose=True):
         "log": eng.log[-200:], "notes": state.pop("_run_notes", {}),
         "drawdown": round(eng.drawdown, 4), "halted": eng.halt_directional,
         "seconds": round(time.time() - t0, 1),
+        "variants": {"books": len(vsum), "new_trades": sum(v["new"] for v in vsum.values()),
+                     "exits": sum(v["exits"] for v in vsum.values()),
+                     "settled": sum(v for i, v in settled.items() if i > 0)},
     }
     state.pop("_event_meta", None)
     save_json(S / "portfolio.json", state, compact=True)
     save_json(S / "history.json.gz", history)
     save_json(S / "calibration.json.gz", calibration)
+    save_json(S / "variants.json.gz", vstate)
     publish(state, strategies, calibration)
+    save_json(config.DOCS_DATA / "analysis.json", analysis(vstate, state, now), compact=True)
     if verbose:
         lc = state["last_cycle"]
         print(f"events={n_events} markets={n_raw} universe={lc['universe']} trades={lc['new_trades']} "
@@ -239,6 +229,7 @@ def run_cycle(trade=True, client=None, verbose=True):
               f"({lc['seconds']}s)")
         for line in eng.log[:80]:
             print("  ", line)
+        print("variants:", state["last_cycle"]["variants"])
     return state
 
 

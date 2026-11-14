@@ -36,3 +36,17 @@ footer{color:var(--mut);font-size:11px;text-align:center;padding:20px 8px 40px}
 #ptr{position:fixed;top:-40px;left:0;right:0;text-align:center;color:var(--mut);font-size:13px;transition:top .2s;z-index:10}
 .log{font:11px/1.45 ui-monospace,Menlo,monospace;white-space:pre-wrap;color:#b9c6d8}
 .filter{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}.filter select{background:var(--card);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px}
+/* analysis */
+.callout{background:linear-gradient(135deg,rgba(56,189,248,.16),rgba(34,197,94,.12));border:1px solid #1f4d63;border-radius:14px;padding:12px;margin-bottom:10px}
+.callout .k{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.08em}.callout .v{font-size:18px;font-weight:750;margin:2px 0}
+.caveat{color:var(--warn);font-size:12px;margin-top:6px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px}.chips button{flex:0 0 auto;background:var(--card);border:1px solid var(--line);color:var(--mut);padding:5px 10px;border-radius:999px;font-size:12px;font-weight:600}
+.chips button.on{background:var(--card2);color:var(--txt);border-color:var(--acc)}
+.heat{overflow-x:auto;margin-bottom:10px}.heat table{min-width:420px;border-collapse:separate;border-spacing:3px}
+.heat th{font-size:10px;color:var(--mut);font-weight:600;text-align:center;border:0;padding:2px}.heat th.r{text-align:left}
+.heat td{text-align:center;border:0;border-radius:8px;padding:9px 2px;font-weight:700;font-size:12px;cursor:pointer;background:var(--card2)}
+.heat td.sel{outline:2px solid var(--acc)}.heat td small{display:block;font-weight:500;font-size:9px;color:rgba(231,237,246,.7)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;font-size:12px}.grid2 span{color:var(--mut)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--mut);margin-top:4px}.legend i{display:inline-block;width:10px;height:3px;margin-right:4px;vertical-align:middle}
+#toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(120px);background:var(--card2);border:1px solid var(--acc);color:var(--txt);padding:10px 14px;border-radius:12px;font-size:13px;transition:transform .3s;z-index:20;max-width:90vw}
+#toast.show{transform:translateX(-50%) translateY(0)}

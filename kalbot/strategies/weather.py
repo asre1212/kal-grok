@@ -83,7 +83,10 @@ class WeatherNWS(Strategy):
 
     def run(self, eng, nws=None):
         P = eng.params[self.name]
-        nws = nws or NWS(eng.state.setdefault("nws_cache", {}))
+        if nws is None:
+            nws = eng.shared.get("nws")
+            if nws is None:
+                nws = eng.shared["nws"] = NWS(eng.shared.get("nws_cache") or eng.state.setdefault("nws_cache", {}))
         trades = evaluated = 0
         notes = []
         for ev, ms in eng.events.items():

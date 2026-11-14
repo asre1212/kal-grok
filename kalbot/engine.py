@@ -6,10 +6,12 @@ from . import config
 from .execution import Book, simulate_buy, simulate_sell
 from .fees import fee_per_contract
 from .sizing import kelly_contracts, cap_contracts
+from .orders import entry_price, post as post_order, has_resting, stats as order_stats
 
 
 class Engine:
-    def __init__(self, state, portfolio, markets, client=None, history=None, now=None, dry=False):
+    def __init__(self, state, portfolio, markets, client=None, history=None, now=None, dry=False,
+                 shared=None, rules=None):
         self.state = state
         self.pf = portfolio
         self.markets = markets              # ticker -> compact market
@@ -20,8 +22,12 @@ class Engine:
         self.history = history or {}
         self.now = now
         self.dry = dry
-        self.books = {}
-        self.ob_calls = 0
+        # one orderbook cache / fetch budget shared by main + shadow variants per cycle
+        self.shared = shared if shared is not None else {}
+        self.shared.setdefault("books", {})
+        self.shared.setdefault("ob_calls", 0)
+        self.books = self.shared["books"]
+        self.rules = rules or {}
         self.log = []                        # human-readable decisions
         self.params = state["params"]
         self.alloc = state["allocation"]
@@ -39,6 +45,21 @@ class Engine:
         for p in portfolio.positions.values():
             self.claimed.setdefault(p["ticker"], p["side"])
 
+    @property
+    def ob_calls(self):
+        return self.shared["ob_calls"]
+
+    def bucket_weight(self, m):
+        bw = self.rules.get("bucket_weights") or {}
+        if not bw or self.now is None:
+            return 1.0
+        return float(bw.get(config.bucket_of(m, self.now), 1.0))
+
+    def cooling(self, ticker):
+        cd = self.pf.p.get("cooldown") or {}
+        ts = cd.get(ticker)
+        return ts is not None and self.now is not None and self.now - ts < config.EXIT_COOLDOWN_HOURS * 3600
+
     def refresh_exposure(self):
         self.ex = self.pf.exposures()
         self.equity = self.pf.equity()
@@ -49,9 +70,9 @@ class Engine:
         if t in self.books:
             return self.books[t]
         b = None
-        if self.client is not None and self.ob_calls < config.RISK["max_orderbooks_per_run"]:
+        if self.client is not None and self.shared["ob_calls"] < config.RISK["max_orderbooks_per_run"]:
             try:
-                self.ob_calls += 1
+                self.shared["ob_calls"] += 1
                 b = Book.from_api(self.client.orderbook(t))
             except Exception:
                 b = None
@@ -99,12 +120,16 @@ class Engine:
         return c is not None and c != side
 
     # ---------- directional taker trade ----------
-    def take(self, strat, m, side, p_model, min_edge, note=""):
-        """Kelly-sized taker buy of `side` if edge after fees >= min_edge."""
+    def take(self, strat, m, side, p_model, min_edge, note="", urgent=False):
+        """Kelly-sized buy of `side` if edge after fees >= min_edge. Posts a passive limit order
+        (maker) unless the trade is time-critical (urgent / expiring within LIMIT['taker_hours'])."""
         if self.halt_directional or not self.active(strat) or self.conflict(m, side):
             return None
-        if self.holds(strat, ticker=m["t"]):
-            return None   # don't re-buy the same displayed liquidity every snapshot
+        if self.holds(strat, ticker=m["t"]) or self.cooling(m["t"]) or has_resting(self.pf, strat, m["t"]):
+            return None   # don't re-buy the same displayed liquidity / just-exited markets
+        hours = ((m.get("exp") or m.get("close") or 0) - (self.now or 0)) / 3600
+        if config.ORDER_MODE == "limit" and not urgent and hours > config.LIMIT["taker_hours"]:
+            return self.post_entry(strat, m, side, p_model, min_edge, note)
         ask = m["ya"] if side == "yes" else m["na"]
         if not (0 < ask < 1):
             return None
@@ -115,6 +140,7 @@ class Engine:
             return None
         qty = kelly_contracts(p_model, ask, fpc, self.sleeve(strat),
                               config.RISK["kelly_fraction"], self.dd_mult)
+        qty = int(qty * self.bucket_weight(m))
         qty = cap_contracts(qty, ask + fpc, self.room(strat, m))
         if qty < config.RISK["min_contracts"]:
             return None
@@ -131,11 +157,36 @@ class Engine:
         p_mkt = round(mid_yes if side == "yes" else 1 - mid_yes, 4)
         pos = self.pf.buy(strat, m, side, fill["qty"], fill["cost"], fill["fee"], p_model, note=note, p_mkt=p_mkt)
         if pos:
+            st = order_stats(self.pf)
+            st["taker_fills"] += 1
+            st["taker_fees"] = round(st["taker_fees"] + fill["fee"], 4)
             self._book_exposure(strat, m, fill["cost"] + fill["fee"])
             self.claimed[m["t"]] = side
             self.log.append(f"{strat}: BUY {fill['qty']} {side.upper()} {m['t']} @ {fill['avg']:.2f} "
                             f"(p={p_model:.3f}, edge={real_edge:.3f}) {note}")
         return pos
+
+    def post_entry(self, strat, m, side, p_model, min_edge, note=""):
+        q = entry_price(m, side)
+        if q is None:
+            return None
+        fm, ft = m.get("fm", 1.0), m.get("ft", "quadratic")
+        mfpc = fee_per_contract(q, fm) * (config.MAKER_RATE / config.TAKER_RATE if "maker" in (ft or "") else 0.0)
+        gross = p_model - q
+        edge = gross - mfpc
+        if edge < min_edge or (gross > 0 and mfpc / gross > config.RISK["max_fee_to_edge"]):
+            return None
+        qty = kelly_contracts(p_model, q, mfpc, self.sleeve(strat), config.RISK["kelly_fraction"], self.dd_mult)
+        qty = int(qty * self.bucket_weight(m))
+        qty = cap_contracts(qty, q + mfpc, self.room(strat, m))
+        if qty < config.RISK["min_contracts"]:
+            return None
+        o = post_order(self, strat, m, side, "buy", q, qty, p_model=p_model, note=note)
+        self._book_exposure(strat, m, qty * q)
+        self.claimed[m["t"]] = side
+        self.log.append(f"{strat}: POST LIMIT BUY {qty} {side.upper()} {m['t']} @ {q:.2f} "
+                        f"(ask {m['ya'] if side == 'yes' else m['na']:.2f}, p={p_model:.3f}, edge={edge:.3f}) {note}")
+        return o
 
     # ---------- multi-leg basket (arbitrage) ----------
     def take_basket(self, strat, legs, guaranteed_payout, min_profit, group, note=""):
@@ -168,6 +219,9 @@ class Engine:
                         return None
                     for (m, side, b), fl in zip(books, fills):
                         self.pf.buy(strat, m, side, q, fl["cost"], fl["fee"], p_model=None, group=group, note=note)
+                        st = order_stats(self.pf)
+                        st["taker_fills"] += 1
+                        st["taker_fees"] = round(st["taker_fees"] + fl["fee"], 4)
                         self._book_exposure(strat, m, fl["cost"] + fl["fee"])
                         self.claimed.setdefault(m["t"], side)
                     self.log.append(f"{strat}: BASKET x{q} {group} cost={cost:.2f} locked profit={profit:.2f} {note}")
@@ -186,6 +240,12 @@ class Engine:
         if fill["qty"] <= 0:
             return None
         pnl = self.pf.sell(key, fill["qty"], fill["proceeds"], fill["fee"], reason)
+        st = order_stats(self.pf)
+        st["taker_fills"] += 1
+        st["taker_fees"] = round(st["taker_fees"] + fill["fee"], 4)
+        if self.now is not None:
+            cd = self.pf.p.setdefault("cooldown", {})
+            cd[pos["ticker"]] = int(self.now)
         self.log.append(f"{pos['strategy']}: SELL {fill['qty']} {pos['side'].upper()} {pos['ticker']} "
                         f"@ {fill['avg']:.2f} pnl={pnl:+.2f} ({reason})")
         return pnl

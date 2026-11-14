@@ -25,7 +25,7 @@ FEE_ROUND_UNIT = 0.01        # conservative: round up to the cent (schedule says
 UNIVERSE = dict(
     min_volume_24h=20.0,
     min_open_interest=200.0,
-    max_days_to_close=120,
+    max_days_to_close=730,      # universe (variants); main portfolio limited by MAIN_MAX_DAYS
     history_max_markets=800,    # markets with rolling price history kept
     history_len=28,             # snapshots kept per market (~7 days at 4/day)
 )
@@ -43,8 +43,56 @@ RISK = dict(
     dd_hard=0.25,               # drawdown -> no new directional trades
     min_contracts=5,
     max_fee_to_edge=0.5,        # skip trades where fees eat > 50% of gross edge
-    max_orderbooks_per_run=250,
+    max_orderbooks_per_run=450, # shared by main + all shadow variants
 )
+
+MAIN_MAX_DAYS = 120
+
+# ---------- Order placement ----------
+# "limit": post passive maker orders where the edge isn't time-critical (see kalbot/orders.py);
+# "taker": always cross the spread (the old behaviour).
+ORDER_MODE = "limit"
+LIMIT = dict(
+    max_age=2,              # snapshots a resting order lives before being cancelled
+    fill_frac=0.10,         # queue-position haircut: share of new volume we get
+    deep_fill_frac=0.35,    # when price moved >= 2c through our limit
+    taker_hours=24,         # markets expiring sooner than this are traded as taker (time-critical)
+)
+
+# ---------- Shadow variants: expiry bucket x exit rule (each its own $100k paper book) ----------
+# (id, label, min_days, max_days) on expected expiration
+EXPIRY_BUCKETS = [
+    ("1d", "≤1 day (<48h)", 0, 2),
+    ("1m", "2–31 days", 2, 32),
+    ("6m", "32–183 days", 32, 184),
+    ("6m+", ">6 months", 184, 731),
+]
+# (id, label, take_profit, stop_loss) as fractions of position cost
+EXIT_RULES = [
+    ("hold", "Hold to settle", None, None),
+    ("tp10", "+10%", 0.10, None),
+    ("tp25", "+25%", 0.25, None),
+    ("tp50", "+50%", 0.50, None),
+    ("tp100", "+100%", 1.00, None),
+    ("tp25sl25", "+25% / −25% SL", 0.25, 0.25),
+]
+MAIN_TP_STEPS = [None, 0.10, 0.25, 0.50, 1.00]
+DEFAULT_MAIN_RULES = {"tp": None, "sl": None,
+                      "bucket_weights": {"1d": 1.0, "1m": 1.0, "6m": 1.0, "6m+": 1.0}}
+BUCKET_WEIGHT_BOUNDS = (0.5, 1.5)
+EXIT_COOLDOWN_HOURS = 24
+
+
+def bucket_of(m, now):
+    t = m.get("exp") or m.get("close")
+    if not t:
+        return None
+    days = (t - now) / 86400
+    for bid, _, lo, hi in EXPIRY_BUCKETS:
+        if lo <= days < hi:
+            return bid
+    return None
+
 
 INITIAL_ALLOCATION = {
     "event_arb": 0.14,

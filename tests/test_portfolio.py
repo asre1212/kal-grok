@@ -49,10 +49,10 @@ def test_engine_take_respects_caps_and_fees():
     now = 1_800_000_000
     m = mk("M2", 0.50, 0.51, now=now)
     eng = Engine(st, pf, {"M2": m}, client=None, now=now)
-    pos = eng.take("longshot_fade", m, "yes", 0.70, 0.02)
+    pos = eng.take("longshot_fade", m, "yes", 0.70, 0.02, urgent=True)
     assert pos is not None
     assert pos["cost"] <= config.RISK["max_market_frac"] * 100_000 + 1
     # no edge after fees -> no trade
     m3 = mk("M3", 0.50, 0.51, now=now)
     eng.markets["M3"] = m3
-    assert eng.take("longshot_fade", m3, "yes", 0.52, 0.02) is None
+    assert eng.take("longshot_fade", m3, "yes", 0.52, 0.02, urgent=True) is None

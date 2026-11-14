@@ -57,6 +57,9 @@ def publish(state, strategies, calibration=None):
         "reserve_weight": config.RESERVE_WEIGHT, "strategies": strat_rows,
         "last_cycle": lc, "calibration": {**state.get("calibration_fit", {}), "samples": len(calibration or [])},
         "cash_apy_assumption": config.CASH_APY,
+        "gross_pnl": round(equity - start + pfs["fees"], 2),
+        "orders": pfs.get("orders", {}), "order_mode": config.ORDER_MODE,
+        "main_rules": state.get("main_rules"),
     }
     save_json(D / "summary.json", summary)
 

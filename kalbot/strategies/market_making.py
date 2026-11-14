@@ -3,14 +3,12 @@
 Each run we post a 1-cent-improved bid on BOTH sides (YES bid at yes_bid+1c and NO bid at
 no_bid+1c). If both fill, YES+NO nets to a guaranteed $1 (Kalshi nets opposite positions),
 locking in roughly spread - 2c. Inventory is skewed: the side that flattens inventory is
-quoted larger. Fills are CONSERVATIVE and checked on the next snapshot:
-  * a resting buy at price q fills only if the market traded through it (current ask <= q,
-    or last trade <= q - 1c with new volume), and
-  * at most fill_frac x (new volume since posting) contracts fill (queue position haircut).
-Unfilled quotes are cancelled each run. Maker fees are charged on series that have them.
+quoted larger. Fills use the shared conservative limit-order model in kalbot/orders.py (trade-through
+required, queue haircut = fill_frac x new volume, partial fills); quotes live one snapshot and
+are re-posted each run. Maker fees are charged on series that have them.
 """
 from .base import Strategy
-from ..fees import maker_fee
+from ..orders import post as post_order
 
 
 class MarketMaking(Strategy):
@@ -19,29 +17,7 @@ class MarketMaking(Strategy):
     max_markets = 20
 
     def manage(self, eng):
-        P = eng.params[self.name]
-        still = []
-        for r in eng.pf.p["resting"]:
-            if r["strategy"] != self.name:
-                still.append(r)
-                continue
-            m = eng.markets.get(r["ticker"])
-            if not m:
-                continue  # market gone / filtered: cancel
-            dv = max(0.0, m["vol"] - r["vol"])
-            ask = m["ya"] if r["side"] == "yes" else m["na"]
-            last_side = m["lp"] if r["side"] == "yes" else (1 - m["lp"] if m["lp"] > 0 else 1)
-            through = (0 < ask <= r["price"]) or (dv > 0 and 0 < last_side <= r["price"] - 0.01)
-            if not through or dv <= 0:
-                continue  # cancel (re-quoted below)
-            q = int(min(r["qty"], P["fill_frac"] * dv))
-            if q < 1:
-                continue
-            fee = maker_fee(q, r["price"], m.get("fm", 1.0), m.get("ft", "quadratic"))
-            if eng.pf.buy(self.name, m, r["side"], q, round(q * r["price"], 4), fee,
-                          p_model=None, maker=True, note="passive fill"):
-                eng.log.append(f"market_making: FILL {q} {r['side'].upper()} {m['t']} @ {r['price']:.2f} (maker)")
-        eng.pf.p["resting"] = still
+        # fills of resting quotes are handled by kalbot.orders.process_resting (shared model)
         self.net_pairs(eng)
 
     def net_pairs(self, eng):
@@ -99,9 +75,8 @@ class MarketMaking(Strategy):
                 qty = int(min(max(qty, 0), room / px))
                 if qty < 5:
                     continue
-                eng.pf.p["resting"].append({"strategy": self.name, "ticker": m["t"], "side": side,
-                                            "price": px, "qty": qty, "vol": m["vol"], "ts": int(eng.now),
-                                            "kind": "entry"})
+                post_order(eng, self.name, m, side, "buy", px, qty, kind="entry", max_age=1,
+                           ff=P["fill_frac"], note="MM quote")
                 eng.ex["strategy"][self.name] += qty * px
                 eng.ex["market"][m["t"]] += qty * px
         eng.state.setdefault("_run_notes", {})[self.name] = f"quoting {len(chosen)} markets"

@@ -171,9 +171,13 @@ class Portfolio:
             ex["cat"][p["cat"]] += c
             ex["strategy"][p["strategy"]] += c
         for r in self.p["resting"]:
-            if r.get("kind") == "entry":
-                ex["strategy"][r["strategy"]] += r["qty"] * r["price"]
-                ex["market"][r["ticker"]] += r["qty"] * r["price"]
+            if r.get("kind") == "entry" and r.get("action", "buy") == "buy":
+                c = (r["qty"] - r.get("filled", 0)) * r["price"]
+                ex["strategy"][r["strategy"]] += c
+                ex["market"][r["ticker"]] += c
+                for k, f in (("event", "event"), ("series", "series"), ("cat", "cat")):
+                    if r.get(f):
+                        ex[k][r[f]] += c
         return ex
 
     def strategy_pnl(self, strat):

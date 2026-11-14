@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
 <link rel="manifest" href="manifest.json">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=__BUILD__">
 </head>
 <body>
 <div id="ptr">↓ Pull to refresh</div>
@@ -32,18 +32,21 @@
   <section class="kpis" id="kpis"></section>
   <nav class="tabs" id="tabs">
     <button data-tab="positions" class="on">Positions</button>
+    <button data-tab="analysis">Analysis</button>
     <button data-tab="trades">Trades</button>
     <button data-tab="strategies">Strategies</button>
     <button data-tab="report">Weekly</button>
     <button data-tab="run">Last run</button>
   </nav>
   <section id="tab-positions" class="tab on"></section>
+  <section id="tab-analysis" class="tab"></section>
   <section id="tab-trades" class="tab"></section>
   <section id="tab-strategies" class="tab"></section>
   <section id="tab-report" class="tab"></section>
   <section id="tab-run" class="tab"></section>
-  <footer>Hypothetical paper trading on public Kalshi data. No real orders, no real money. Not financial advice.</footer>
+  <footer>Hypothetical paper trading on public Kalshi data. No real orders, no real money. Not financial advice.<br><span id="build">build __BUILD__</span></footer>
+  <div id="toast" role="status"></div>
 </main>
-<script src="app.js"></script>
+<script src="app.js?v=__BUILD__"></script>
 </body>
 </html>

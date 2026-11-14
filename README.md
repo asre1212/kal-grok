@@ -25,11 +25,15 @@ kalbot/
   history.py        rolling price history, calibration samples harvested from settlements
   evaluate.py       weekly scoring, bandit reallocation, parameter tuning, weekly report
   publish.py        writes docs/data/*.json for the dashboard
+  orders.py         passive limit orders (maker) + conservative fill model
+  exits.py          take-profit / stop-loss exit rules
+  variants.py       24 shadow $100k books (expiry bucket x exit rule) + analysis + weekly adoption
   run.py            one full cycle (python -m kalbot.run)
 state/              bot state (portfolio.json, history.json.gz, calibration.json.gz, series_fees.json)
 docs/               PWA dashboard (GitHub Pages) + docs/data/*.json + docs/data/reports/
 tests/              pytest suite (fees, Kelly, arbitrage, settlement, models, live dry run)
 scripts/make_icons.py   regenerates the PNG app icons with Pillow
+scripts/stamp_build.sh  stamps the PWA build id into docs/ at deploy time (auto-update)
 .github/workflows/  trade.yml (every ~6-7h), weekly.yml (Sundays), pages.yml (deploy on your pushes)
 ```
 
@@ -37,7 +41,7 @@ scripts/make_icons.py   regenerates the PNG app icons with Pillow
 
 1. **Snapshot** — pages through `/events?status=open&with_nested_markets=true` (≈21k events / ≈205k
    markets) and keeps a *tradable universe* (two-sided quotes, 24h volume ≥ 20 or open interest ≥ 200,
-   closes within 120 days; full bucket sets kept for exhaustive events). Series fee settings
+   closes within 730 days — the main book only trades ≤ 120 days; full bucket sets kept for exhaustive events). Series fee settings
    (`fee_type`, `fee_multiplier`) come from `/series`, cached daily.
 2. **Settle** — any held market that left the open universe is looked up via `/markets?tickers=…`;
    `finalized`/`settled` markets pay $1/$0 by `result` (scalar results use `settlement_value_dollars`).
@@ -68,6 +72,56 @@ Prices on the API are now `*_dollars` strings (e.g. `yes_ask_dollars: "0.4200"`)
 only on series with `fee_type = quadratic_with_maker_fees` (≈160 series), else 0. `M` is the series
 `fee_multiplier` (1 for most; 0.5 or 0 for a few). The schedule now rounds to a centicent; the bot
 rounds **up to the cent** per price level, which is slightly conservative. No settlement fees.
+
+### Order placement: limit orders first (fees minimised)
+
+`ORDER_MODE = "limit"` (config.py). Directional entries are **passive limit buys** posted 1¢ inside
+the best bid (or joining the bid when the spread is 1¢); they never cross the spread. The edge and
+Kelly size are computed at our limit price net of the **maker** fee, which is $0 on most series and
+`round_up(M × 0.0175 × C × P × (1−P))` on the ~160 series whose `fee_type` is
+`quadratic_with_maker_fees`. Take-profit exits are passive limit sells 1¢ inside the ask (never
+below the target). We still **take liquidity** only when the edge is time-critical and clears the
+full taker fee: arbitrage baskets (all legs must fill together), `expiry_convergence`, any entry in a
+market expiring within 24h, stop-losses, momentum/reversion time exits, and a take-profit whose
+limit exit expired unfilled.
+
+**Limit fill model (conservative; read this):** the bot only sees the market every 6–7 hours, so
+fills are coarse. A resting order is checked on the next snapshot and fills only if the market
+*traded through* our price: for a buy at q, the side's ask is now ≤ q, or new volume printed with a
+last trade ≤ q − 1¢ (mirror rules for sells). Even then we get only a queue-position share of the new
+volume: 10% (35% if price moved ≥ 2¢ through us), so partial fills are normal. Unfilled remainders
+are cancelled after 2 snapshots (market-making quotes after 1). Because a buy fills only when price
+comes *down* through it, adverse selection is built in. Real intra-snapshot fills (and misses) are
+not observed, so live fill rates could be higher or lower.
+
+For every maker fill the bot also records the **all-taker baseline**: the taker fee at the ask (bid
+for sells) seen when the order was posted, plus the price improvement versus crossing. The app shows
+fees paid, maker vs taker fees, fees saved, price improvement and fill rate.
+
+### Expiry-bucket × take-profit shadow books
+
+Every cycle also runs **24 shadow paper portfolios**, each with its own $100k: 4 expiry buckets
+(≤1 day / <48h, 2–31 days, 32–183 days, >6 months, by expected expiration) × 6 exit rules (hold to
+settlement, +10%, +25%, +50%, +100% take-profit, and +25% TP with a −25% stop). Each uses the main
+book's strategies, parameters, allocation and risk rules, but may only open positions in its bucket
+and exits by its own rule. A take-profit triggers when the position's mid-mark value ≥ cost × (1+TP).
+Results are **net of every entry and exit fee**; gross (pre-fee) results are shown alongside. They
+reuse the one market snapshot and the shared orderbook cache, so they add no market-data API calls
+(they share the 450-orderbook budget). State: `state/variants.json.gz`. The main book is unchanged
+except that it now uses the same limit-order logic and has its own (initially off) TP/SL and
+expiry-weight knobs (`main_rules`).
+
+The **Analysis** tab shows a heatmap of bucket × rule (net/gross return, fees, fees saved, fill
+rate, realized, unrealized, fills, win rate, max drawdown, Sharpe once there are ≥ 8 snapshots), a
+details card per cell, an equity comparison (main vs the best combo in each bucket), and a "best
+combo so far" callout with a small-sample warning (< 12 snapshots or < 20 closed trades).
+
+Weekly, the report ranks all combos. If one beats the main book **clearly and robustly** (≥ 30
+closed and ≥ 15 settled trades, ≥ 20 snapshots, Sharpe ≥ main + 0.5, net return ≥ main + 1 pt,
+drawdown no worse than main + 5 pts), the main book moves one step toward it: its take-profit moves
+one level along hold → +10% → +25% → +50% → +100%, it adopts the stop-loss if the winner has one,
+and expiry weights shift (winner bucket +0.25, others −0.10, bounded 0.5–1.5; weights scale Kelly
+size). Every change is logged with the numbers behind it.
 
 ### Risk & sizing
 
@@ -153,6 +207,14 @@ To start over: delete `state/*` and `docs/data/*.json` and run a cycle.
 
 On iPhone: open the dashboard in **Safari → Share → Add to Home Screen**. It runs full-screen,
 works offline with the last data, and supports pull-to-refresh.
+
+**Auto-update:** the deploy workflows stamp a build id (git SHA + hash of the app-shell files) into
+`sw.js`, `index.html` and `app.js`. When the code changes, the service worker gets new bytes, installs,
+calls `skipWaiting()` + `clients.claim()`, and the page reloads once ("App updated ✓" toast). The app
+calls `registration.update()` on launch, whenever it returns to the foreground, and every 30 minutes,
+and the SW is registered with `updateViaCache: "none"`. HTML/JS/CSS and data are network-first, with
+the cache used only offline. `start_url`/`scope` never change, so the home-screen icon keeps working.
+Data-only bot commits don't change the build id, so they don't force reloads.
 
 Notes: GitHub may delay scheduled runs by several minutes at busy times, and disables schedules
 in repos with no activity for 60 days (the bot's own commits keep it active). Each cycle commits

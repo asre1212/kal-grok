@@ -185,6 +185,28 @@ def weekly(now=None, write=True):
     start_eq = base[-1]["equity"] if base else config.STARTING_BANKROLL
     end_eq = eq[-1]["equity"] if eq else config.STARTING_BANKROLL
     date = datetime.fromtimestamp(now, NY).strftime("%Y-%m-%d")
+    # ---- expiry-bucket x exit-rule shadow books ----
+    from .variants import analysis as variant_analysis, robust_winner, adopt
+    vstate = load_json(S / "variants.json.gz", {})
+    combos = None
+    if vstate:
+        an = variant_analysis(vstate, state, now)
+        win, top, why_not = robust_winner(an)
+        state.setdefault("main_rules", json.loads(json.dumps(config.DEFAULT_MAIN_RULES)))
+        adopted = []
+        if win:
+            adopted = adopt(state["main_rules"], win)
+            changes += [f"**main rules** {c} — {win['id']} beat main on net return "
+                        f"({win['net_return_pct']:+.2f}% vs {an['main']['net_return_pct']:+.2f}%) and Sharpe "
+                        f"({win['sharpe']} vs {an['main']['sharpe']}) with {win['closed']} closed trades" for c in adopted]
+        rows = [next(x for x in an["cells"] if x["id"] == vid) for vid in an["ranking"]]
+        combos = {"ranking": [{k: c[k] for k in ("id", "bucket_label", "rule_label", "net_return_pct", "gross_return_pct",
+                                                  "fees", "fees_saved", "fill_rate", "trades", "closed", "win_rate",
+                                                  "max_dd_pct", "sharpe", "adequate")} for c in rows],
+                  "main": {k: an["main"][k] for k in ("net_return_pct", "gross_return_pct", "fees", "sharpe", "max_dd_pct", "closed")},
+                  "top": top["id"] if top else None, "adopted": adopted,
+                  "not_adopted_because": None if win else why_not, "main_rules": state.get("main_rules")}
+
     report = {
         "date": date, "generated": int(now), "equity_start": start_eq, "equity_end": end_eq,
         "week_pnl": round(end_eq - start_eq, 2), "week_return_pct": round((end_eq / start_eq - 1) * 100, 3),
@@ -193,7 +215,7 @@ def weekly(now=None, write=True):
         "metrics": metrics, "scores": {n: round(score(metrics[n]), 3) for n in metrics},
         "allocation_old": old_alloc, "allocation_new": state["allocation"],
         "status": state["strategy_status"], "param_changes": param_changes,
-        "calibration_fit": state["calibration_fit"], "autocorr": rho, "changes": changes,
+        "calibration_fit": state["calibration_fit"], "autocorr": rho, "changes": changes, "combos": combos,
     }
     md = render_md(report)
     if write:
@@ -234,6 +256,24 @@ def render_md(r):
                  f"{m['max_drawdown']:.1%} | {r['scores'][n]:+.2f} | {r['allocation_old'].get(n, 0):.1%} → {r['allocation_new'].get(n, 0):.1%} |")
     L += ["", "## What changed and why", ""]
     L += [f"- {c}" for c in r["changes"]] or ["- No changes (insufficient evidence)."]
+    cb = r.get("combos")
+    if cb:
+        mn = cb["main"]
+        L += ["", "## Expiry bucket × take-profit combos (net of all fees)", "",
+              f"Main book: net {mn['net_return_pct']:+.2f}% (gross {mn['gross_return_pct']:+.2f}%), fees ${mn['fees']:,.2f}, "
+              f"Sharpe {_f(mn['sharpe'])}, max DD {mn['max_dd_pct']:.2f}%, {mn['closed']} closed.", "",
+              "| # | Expiry | Exit rule | Net ret | Gross ret | Fees | Saved vs taker | Fill rate | Trades | Closed | Win | MaxDD | Sharpe |",
+              "|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        for i, c in enumerate(cb["ranking"][:12], 1):
+            L.append(f"| {i} | {c['bucket_label']} | {c['rule_label']} | {c['net_return_pct']:+.2f}% | {c['gross_return_pct']:+.2f}% | "
+                     f"${c['fees']:,.2f} | ${c['fees_saved']:,.2f} | {_f(c['fill_rate'], '{:.0%}')} | {c['trades']} | {c['closed']} | "
+                     f"{_f(c['win_rate'], '{:.0%}')} | {c['max_dd_pct']:.1f}% | {_f(c['sharpe'])}{'' if c['adequate'] else ' *'} |")
+        L.append("")
+        L.append("_* small sample_")
+        if cb["adopted"]:
+            L += ["", "Adopted into the main book:"] + [f"- {a}" for a in cb["adopted"]]
+        else:
+            L += ["", f"Main rules unchanged — top combo `{cb['top']}` not adopted: {', '.join(cb['not_adopted_because'] or [])}."]
     L += ["", "## Tuning notes", ""]
     for n, pc in r["param_changes"].items():
         for why in pc["reasons"]:

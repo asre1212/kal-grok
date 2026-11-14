@@ -62,6 +62,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0
+      - name: Stamp PWA build id (versioned service worker -> auto-update)
+        run: echo "build=$(bash scripts/stamp_build.sh)"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

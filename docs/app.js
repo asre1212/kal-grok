@@ -1,5 +1,6 @@
 /* kal-grok dashboard — plain JS, no build step. Reads ./data/*.json written by the bot. */
 const TZ = "America/New_York";
+const BUILD = "__BUILD__";
 const $ = (s) => document.querySelector(s);
 const money = (v, d = 2) => v == null ? "—" : (v < 0 ? "-$" : "$") + Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 const signed = (v, d = 2) => v == null ? "—" : (v >= 0 ? "+" : "") + money(v, d);
@@ -47,6 +48,9 @@ function kpis(s) {
     ["Fees paid", money(s.fees), "mut"], ["Drawdown", pct(-s.drawdown_pct), s.drawdown_pct > 0 ? "dn" : "mut"],
     ["Liquidation value", money(s.liquidation_equity), ""], ["Open positions", s.open_positions, ""],
     ["Cash interest", money(s.interest), "mut"], ["Runs", s.runs, ""],
+    ["Gross P&L (pre-fee)", signed(s.gross_pnl), cls(s.gross_pnl)],
+    ["Limit fill rate", (() => { const o = s.orders || {}, r = (o.filled_qty || 0) + (o.cancelled_qty || 0); return r ? Math.round(100 * o.filled_qty / r) + "%" : "—"; })(), ""],
+    ["Fees saved vs taker", money((s.orders || {}).fees_saved || 0), "up"], ["Order mode", s.order_mode || "—", "mut"],
   ];
   $("#kpis").innerHTML = k.map(([l, v, c]) => `<div class="kpi"><span>${l}</span><b class="${c}">${v}</b></div>`).join("");
 }
@@ -127,6 +131,96 @@ function lastRun(s) {
     <div class="item"><div class="log">${esc(Object.entries(c.notes || {}).map(([k, v]) => `${k}: ${v}`).join("\n"))}\n\n${esc((c.log || []).join("\n")) || "No decisions logged."}</div></div>`;
 }
 
+// ---------------- Analysis tab ----------------
+const METRICS = [
+  ["net_return_pct", "Net return", (v) => pct(v), "div"], ["gross_return_pct", "Gross return", (v) => pct(v), "div"],
+  ["fees", "Fees paid", (v) => money(v, 0), "cost"], ["fees_saved", "Saved vs taker", (v) => money(v, 0), "seq"],
+  ["fill_rate", "Fill rate", (v) => v == null ? "—" : Math.round(v * 100) + "%", "seq"],
+  ["realized", "Realized", (v) => signed(v, 0), "div"], ["unrealized", "Unrealized", (v) => signed(v, 0), "div"],
+  ["trades", "Fills", (v) => v, "seq"], ["win_rate", "Win rate", (v) => v == null ? "—" : Math.round(v * 100) + "%", "seq"],
+  ["max_dd_pct", "Max DD", (v) => (v || 0).toFixed(2) + "%", "cost"], ["sharpe", "Sharpe", (v) => v == null ? "—" : v.toFixed(2), "div"],
+];
+let AN = null, METRIC = "net_return_pct", SEL = null;
+
+function heatColor(v, kind, maxAbs) {
+  if (v == null || !maxAbs) return "var(--card2)";
+  const t = Math.min(1, Math.abs(v) / maxAbs);
+  if (kind === "div") return v >= 0 ? `rgba(34,197,94,${0.15 + 0.6 * t})` : `rgba(239,68,68,${0.15 + 0.6 * t})`;
+  if (kind === "cost") return `rgba(245,158,11,${0.1 + 0.55 * t})`;
+  return `rgba(56,189,248,${0.12 + 0.6 * t})`;
+}
+
+function curves(el, series) {
+  const all = series.flatMap((s) => s.pts);
+  if (all.length < 2) { el.innerHTML = '<div class="empty">Curves appear after a few cycles</div>'; return; }
+  const W = 600, H = 160, P = 6;
+  const xs = all.map((p) => p[0]), ys = all.map((p) => p[1]).concat([AN.start_bankroll]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs), y0 = Math.min(...ys), y1 = Math.max(...ys), pad = (y1 - y0) * 0.1 || 50;
+  const X = (t) => P + (W - 2 * P) * (x1 === x0 ? 1 : (t - x0) / (x1 - x0));
+  const Y = (v) => H - P - (H - 2 * P) * ((v - (y0 - pad)) / ((y1 + pad) - (y0 - pad)));
+  const paths = series.map((s) => {
+    const pts = s.pts.length === 1 ? [[x0, AN.start_bankroll], s.pts[0]] : s.pts;
+    return `<path d="${pts.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + "," + Y(p[1]).toFixed(1)).join("")}" fill="none" stroke="${s.color}" stroke-width="${s.w || 1.8}" vector-effect="non-scaling-stroke"/>`;
+  }).join("");
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="width:100%;height:160px">
+    <line x1="0" x2="${W}" y1="${Y(AN.start_bankroll)}" y2="${Y(AN.start_bankroll)}" stroke="#8a98ad" stroke-dasharray="4 4"/>${paths}
+    <text x="4" y="12" fill="#8a98ad" font-size="11">${money(y1 + pad, 0)}</text><text x="4" y="${H - 4}" fill="#8a98ad" font-size="11">${money(y0 - pad, 0)}</text></svg>
+    <div class="legend">${series.map((s) => `<span><i style="background:${s.color}"></i>${esc(s.label)}</span>`).join("")}</div>`;
+}
+
+function detail(c) {
+  if (!c) return "";
+  const f = (k, l, fmt) => `<span>${l}</span><b>${fmt(c[k])}</b>`;
+  return `<div class="item"><div class="title">${esc(c.bucket_label)} · ${esc(c.rule_label)}${c.adequate ? "" : ' <span class="pill">small sample</span>'}</div>
+    <div class="grid2" style="margin-top:6px">
+    ${f("equity", "Equity", (v) => money(v))}${f("net_return_pct", "Net return", pct)}
+    ${f("gross_return_pct", "Gross return", pct)}${f("fees", "Fees paid", (v) => money(v))}
+    ${f("maker_fees", "Maker fees", (v) => money(v))}${f("taker_fees", "Taker fees", (v) => money(v))}
+    ${f("fees_saved", "Saved vs all-taker", (v) => money(v))}${f("price_improvement", "Price improvement", (v) => money(v))}
+    ${f("fill_rate", "Limit fill rate", (v) => v == null ? "—" : Math.round(v * 100) + "%")}${f("orders_posted", "Limit orders", (v) => v)}
+    ${f("maker_fills", "Maker fills", (v) => v)}${f("taker_fills", "Taker fills", (v) => v)}
+    ${f("realized", "Realized", (v) => signed(v))}${f("unrealized", "Unrealized", (v) => signed(v))}
+    ${f("closed", "Closed trades", (v) => v)}${f("win_rate", "Win rate", (v) => v == null ? "—" : Math.round(v * 100) + "%")}
+    ${f("settled", "Settled", (v) => v)}${f("tp_exits", "TP / SL exits", (v) => `${v} / ${c.sl_exits}`)}
+    ${f("open_positions", "Open positions", (v) => v)}${f("max_dd_pct", "Max drawdown", (v) => (v || 0).toFixed(2) + "%")}
+    ${f("sharpe", "Sharpe", (v) => v == null ? "needs ≥8 runs" : v.toFixed(2))}${f("points", "Snapshots", (v) => v)}
+    </div></div>`;
+}
+
+function renderAnalysis() {
+  const el = $("#tab-analysis");
+  if (!AN || !AN.cells.length) { el.innerHTML = '<div class="empty">Shadow portfolios start with the next cycle.</div>'; return; }
+  const m = METRICS.find((x) => x[0] === METRIC);
+  const vals = AN.cells.map((c) => c[METRIC]).filter((v) => v != null);
+  const maxAbs = Math.max(...vals.map(Math.abs), 0);
+  const cell = (b, r) => AN.cells.find((c) => c.bucket === b && c.rule === r);
+  const best = AN.best, mn = AN.main;
+  const sel = SEL ? AN.cells.find((c) => c.id === SEL) : AN.cells.find((c) => c.id === (best && best.id));
+  const bestCell = best ? AN.cells.find((c) => c.id === best.id) : null;
+  const perBucket = AN.buckets.map((b) => AN.ranking.map((id) => AN.cells.find((c) => c.id === id)).find((c) => c.bucket === b.id)).filter(Boolean);
+  const colors = ["#38bdf8", "#a78bfa", "#f59e0b", "#f472b6"];
+  el.innerHTML = `
+    <div class="callout"><div class="k">Best combo so far (net of all fees)</div>
+      <div class="v">${best ? `${esc(best.bucket_label)} · ${esc(best.rule_label)}` : "—"}</div>
+      <div class="meta">${best ? `Net ${pct(best.return_pct)} · gross ${pct(bestCell.gross_return_pct)} · fees ${money(bestCell.fees)} · ${best.trades} fills · ${best.closed} closed · Sharpe ${best.sharpe == null ? "—" : best.sharpe}` : ""}</div>
+      <div class="meta">Main book: net ${pct(mn.net_return_pct)} · gross ${pct(mn.gross_return_pct)} · fees ${money(mn.fees)} · fill rate ${mn.fill_rate == null ? "—" : Math.round(mn.fill_rate * 100) + "%"} · saved vs taker ${money(mn.fees_saved)}</div>
+      ${AN.caveat ? `<div class="caveat">⚠︎ ${esc(AN.caveat)}</div>` : ""}</div>
+    <div class="chips">${METRICS.map(([k, l]) => `<button data-m="${k}" class="${k === METRIC ? "on" : ""}">${l}</button>`).join("")}</div>
+    <div class="heat"><table><tr><th class="r">Expiry ↓ / Exit →</th>${AN.rules.map((r) => `<th>${esc(r.label)}</th>`).join("")}</tr>
+      ${AN.buckets.map((b) => `<tr><th class="r">${esc(b.label)}</th>${AN.rules.map((r) => {
+        const c = cell(b.id, r.id); if (!c) return "<td>—</td>";
+        return `<td data-id="${c.id}" class="${sel && sel.id === c.id ? "sel" : ""}" style="background:${heatColor(c[METRIC], m[3], maxAbs)}">${m[2](c[METRIC])}<small>${c.trades} fills</small></td>`;
+      }).join("")}</tr>`).join("")}
+    </table></div>
+    <div class="meta" style="margin:-4px 0 8px">Each cell is a separate $100k paper book: same strategies & risk rules, entries limited to that expiry bucket, exits by that rule. All returns are NET of entry + exit fees. Tap a cell for details.</div>
+    ${detail(sel)}
+    <div class="item"><div class="title">Equity: main vs best per expiry bucket</div><div id="cmp"></div></div>`;
+  curves($("#cmp"), [{ label: "Main book", pts: mn.curve, color: "#22c55e", w: 2.6 },
+    ...perBucket.map((c, i) => ({ label: `${c.bucket_label} · ${c.rule_label}`, pts: c.curve, color: colors[i % 4] }))]);
+  el.querySelectorAll(".chips button").forEach((b) => b.onclick = () => { METRIC = b.dataset.m; renderAnalysis(); });
+  el.querySelectorAll("td[data-id]").forEach((td) => td.onclick = () => { SEL = td.dataset.id; renderAnalysis(); });
+}
+
 async function load() {
   const btn = $("#refresh"); btn.classList.add("spin");
   try {
@@ -139,6 +233,8 @@ async function load() {
     [POS, TRD] = await Promise.all([getJSON("positions.json"), getJSON("trades.json")]);
     positions(POS, $("#pf")?.value || "all"); trades(TRD);
     report();
+    try { AN = await getJSON("analysis.json"); } catch { AN = null; }
+    renderAnalysis();
   } catch (e) {
     $("#updated").textContent = "offline / no data yet (" + e.message + ")";
   } finally { btn.classList.remove("spin"); }
@@ -149,6 +245,10 @@ document.querySelectorAll("#tabs button").forEach((b) => b.onclick = () => {
   b.classList.add("on"); $("#tab-" + b.dataset.tab).classList.add("on");
 });
 $("#refresh").onclick = load;
+// deep link to a tab, e.g. index.html#analysis
+const openTab = () => { const b = document.querySelector(`#tabs button[data-tab="${location.hash.slice(1)}"]`); if (b) b.click(); };
+document.querySelectorAll("#tabs button").forEach((b) => b.addEventListener("click", () => history.replaceState(null, "", "#" + b.dataset.tab)));
+window.addEventListener("hashchange", openTab); openTab();
 
 // pull-to-refresh (works in iOS standalone mode where the browser's own gesture is absent)
 let y0 = null, pulled = 0;
@@ -160,5 +260,32 @@ window.addEventListener("touchmove", (e) => {
 window.addEventListener("touchend", () => { if (y0 != null && pulled > 110) load(); $("#ptr").style.top = "-40px"; y0 = null; pulled = 0; });
 document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+// ---------------- auto-update ----------------
+function toast(msg, onTap, ms = 4000) {
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  t.onclick = () => { t.classList.remove("show"); onTap && onTap(); };
+  if (ms) setTimeout(() => t.classList.remove("show"), ms);
+}
+if ("serviceWorker" in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    // a new SW (new build) took control: reload once so the new HTML/JS/CSS is used
+    if (!hadController || reloaded) return;
+    reloaded = true;
+    sessionStorage.setItem("kg-updated", "1");
+    location.reload();
+  });
+  navigator.serviceWorker.register("sw.js", { updateViaCache: "none" }).then((reg) => {
+    const check = () => reg.update().catch(() => {});
+    check();
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+    setInterval(check, 30 * 60 * 1000);
+    if (reg.waiting && hadController) toast("Update ready — tap to reload", () => reg.waiting.postMessage("skipWaiting"), 0);
+  }).catch(() => {});
+}
+if (sessionStorage.getItem("kg-updated")) {
+  sessionStorage.removeItem("kg-updated");
+  setTimeout(() => toast("App updated ✓ (build " + BUILD + ")"), 600);
+}
 load();
