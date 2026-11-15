@@ -1,0 +1,736 @@
+{
+ "date": "2026-11-15",
+ "generated": 1794772648,
+ "equity_start": 100000.0,
+ "equity_end": 96819.18,
+ "week_pnl": -3180.82,
+ "week_return_pct": -3.181,
+ "total_return_pct": -3.181,
+ "max_drawdown_week": 0.0285,
+ "metrics": {
+  "event_arb": {
+   "week_pnl": 0.0,
+   "week_return": 0.0,
+   "total_pnl": 0.0,
+   "sharpe": null,
+   "sortino": null,
+   "max_drawdown": 0.0,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "ladder_arb": {
+   "week_pnl": 2.31,
+   "week_return": 0.00023,
+   "total_pnl": 2.31,
+   "sharpe": 20.94,
+   "sortino": 136.885,
+   "max_drawdown": 0.0001,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "longshot_fade": {
+   "week_pnl": -117.66,
+   "week_return": -0.00792,
+   "total_pnl": -117.66,
+   "sharpe": -28.675,
+   "sortino": -28.127,
+   "max_drawdown": 0.0075,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "expiry_convergence": {
+   "week_pnl": -2643.34,
+   "week_return": -0.17797,
+   "total_pnl": -2643.34,
+   "sharpe": -24.544,
+   "sortino": -25.06,
+   "max_drawdown": 0.1671,
+   "closed_trades": 12,
+   "closed_all": 12,
+   "hit_rate": 0.75,
+   "settled_trades": 12,
+   "brier": 0.2155,
+   "calibration_gap": 0.1621,
+   "brier_market": 0.2012,
+   "wins_recent": 9,
+   "losses_recent": 3
+  },
+  "momentum": {
+   "week_pnl": 0.0,
+   "week_return": 0.0,
+   "total_pnl": 0.0,
+   "sharpe": null,
+   "sortino": null,
+   "max_drawdown": 0.0,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "mean_reversion": {
+   "week_pnl": 0.0,
+   "week_return": 0.0,
+   "total_pnl": 0.0,
+   "sharpe": null,
+   "sortino": null,
+   "max_drawdown": 0.0,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "market_making": {
+   "week_pnl": -78.86,
+   "week_return": -0.00664,
+   "total_pnl": -78.86,
+   "sharpe": -26.486,
+   "sortino": -26.532,
+   "max_drawdown": 0.0067,
+   "closed_trades": 2,
+   "closed_all": 2,
+   "hit_rate": 0.5,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 1,
+   "losses_recent": 1
+  },
+  "weather_nws": {
+   "week_pnl": -347.81,
+   "week_return": -0.02342,
+   "total_pnl": -347.81,
+   "sharpe": -33.87,
+   "sortino": -31.534,
+   "max_drawdown": 0.012,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  }
+ },
+ "scores": {
+  "event_arb": 0.0,
+  "ladder_arb": 0.305,
+  "longshot_fade": -0.457,
+  "expiry_convergence": -1.0,
+  "momentum": 0.0,
+  "mean_reversion": 0.0,
+  "market_making": -0.432,
+  "weather_nws": -0.737
+ },
+ "allocation_old": {
+  "event_arb": 0.14,
+  "ladder_arb": 0.1,
+  "longshot_fade": 0.15,
+  "expiry_convergence": 0.15,
+  "momentum": 0.07,
+  "mean_reversion": 0.07,
+  "market_making": 0.12,
+  "weather_nws": 0.15
+ },
+ "allocation_new": {
+  "event_arb": 0.1641,
+  "ladder_arb": 0.1443,
+  "longshot_fade": 0.1348,
+  "expiry_convergence": 0.1016,
+  "momentum": 0.0894,
+  "mean_reversion": 0.084,
+  "market_making": 0.1134,
+  "weather_nws": 0.1184
+ },
+ "status": {
+  "event_arb": "active",
+  "ladder_arb": "active",
+  "longshot_fade": "active",
+  "expiry_convergence": "active",
+  "momentum": "active",
+  "mean_reversion": "active",
+  "market_making": "active",
+  "weather_nws": "active"
+ },
+ "param_changes": {
+  "event_arb": {
+   "old": {
+    "min_profit": 0.01
+   },
+   "new": {
+    "min_profit": 0.01
+   },
+   "reasons": []
+  },
+  "ladder_arb": {
+   "old": {
+    "min_profit": 0.01
+   },
+   "new": {
+    "min_profit": 0.01
+   },
+   "reasons": []
+  },
+  "longshot_fade": {
+   "old": {
+    "min_edge": 0.015,
+    "beta": 1.12,
+    "p_max": 0.2,
+    "max_days": 60
+   },
+   "new": {
+    "min_edge": 0.015,
+    "beta": 1.12,
+    "p_max": 0.2,
+    "max_days": 60
+   },
+   "reasons": [
+    "min_edge: unchanged (only 0 closed trades)",
+    "beta unchanged: only 0 calibration samples"
+   ]
+  },
+  "expiry_convergence": {
+   "old": {
+    "min_edge": 0.012,
+    "beta": 1.221,
+    "p_min": 0.85,
+    "max_hours": 48
+   },
+   "new": {
+    "min_edge": 0.0144,
+    "beta": 1.0,
+    "p_min": 0.85,
+    "max_hours": 48
+   },
+   "reasons": [
+    "min_edge 0.012 -> 0.0144: losing week, demand more edge",
+    "beta 1.221 -> 1.0: refit on 1582 short-horizon settlements (alpha=-0.037)"
+   ]
+  },
+  "momentum": {
+   "old": {
+    "kappa": 0.35,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "new": {
+    "kappa": 0.35,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "reasons": [
+    "min_edge: unchanged (only 0 closed trades)"
+   ]
+  },
+  "mean_reversion": {
+   "old": {
+    "kappa": -0.35,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "new": {
+    "kappa": -0.35,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "reasons": [
+    "min_edge: unchanged (only 0 closed trades)"
+   ]
+  },
+  "market_making": {
+   "old": {
+    "min_spread": 0.06,
+    "fill_frac": 0.1,
+    "quote_qty": 100
+   },
+   "new": {
+    "min_spread": 0.06,
+    "fill_frac": 0.1,
+    "quote_qty": 100
+   },
+   "reasons": []
+  },
+  "weather_nws": {
+   "old": {
+    "sigma_scale": 1.0,
+    "min_edge": 0.05,
+    "model_weight": 0.35
+   },
+   "new": {
+    "sigma_scale": 1.0,
+    "min_edge": 0.05,
+    "model_weight": 0.35
+   },
+   "reasons": [
+    "min_edge: unchanged (only 0 closed trades)"
+   ]
+  }
+ },
+ "calibration_fit": {
+  "alpha": 0.0,
+  "beta_long": 1.12,
+  "n_long": 0,
+  "alpha_short": -0.0367,
+  "beta_short": 0.977,
+  "n_short": 1582,
+  "ts": 1794772648
+ },
+ "autocorr": null,
+ "changes": [
+  "**event_arb** allocation 14.0% -> 16.4% (score +0.00, week P&L $+0.00)",
+  "**ladder_arb** allocation 10.0% -> 14.4% (score +0.30, week P&L $+2.31)",
+  "**longshot_fade** allocation 15.0% -> 13.5% (score -0.46, week P&L $-117.66)",
+  "**expiry_convergence** allocation 15.0% -> 10.2% (score -1.00, week P&L $-2,643.34)",
+  "**momentum** allocation 7.0% -> 8.9% (score +0.00, week P&L $+0.00)",
+  "**mean_reversion** allocation 7.0% -> 8.4% (score +0.00, week P&L $+0.00)",
+  "**market_making** allocation 12.0% -> 11.3% (score -0.43, week P&L $-78.86)",
+  "**weather_nws** allocation 15.0% -> 11.8% (score -0.74, week P&L $-347.81)",
+  "**expiry_convergence** min_edge: 0.012 -> 0.0144",
+  "**expiry_convergence** beta: 1.221 -> 1.0"
+ ],
+ "combos": {
+  "ranking": [
+   {
+    "id": "6m+|hold",
+    "bucket_label": ">6 months",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -0.031,
+    "gross_return_pct": -0.031,
+    "fees": 0.0,
+    "fees_saved": 6.2,
+    "fill_rate": 0.066,
+    "trades": 7,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.031,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m+|tp10",
+    "bucket_label": ">6 months",
+    "rule_label": "+10%",
+    "net_return_pct": -0.031,
+    "gross_return_pct": -0.031,
+    "fees": 0.0,
+    "fees_saved": 6.2,
+    "fill_rate": 0.066,
+    "trades": 7,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.031,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m+|tp25",
+    "bucket_label": ">6 months",
+    "rule_label": "+25%",
+    "net_return_pct": -0.031,
+    "gross_return_pct": -0.031,
+    "fees": 0.0,
+    "fees_saved": 6.2,
+    "fill_rate": 0.066,
+    "trades": 7,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.031,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m+|tp50",
+    "bucket_label": ">6 months",
+    "rule_label": "+50%",
+    "net_return_pct": -0.031,
+    "gross_return_pct": -0.031,
+    "fees": 0.0,
+    "fees_saved": 6.2,
+    "fill_rate": 0.066,
+    "trades": 7,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.031,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m+|tp100",
+    "bucket_label": ">6 months",
+    "rule_label": "+100%",
+    "net_return_pct": -0.031,
+    "gross_return_pct": -0.031,
+    "fees": 0.0,
+    "fees_saved": 6.2,
+    "fill_rate": 0.066,
+    "trades": 7,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.031,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m+|tp25sl25",
+    "bucket_label": ">6 months",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -0.031,
+    "gross_return_pct": -0.031,
+    "fees": 0.0,
+    "fees_saved": 6.2,
+    "fill_rate": 0.066,
+    "trades": 7,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.031,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m|hold",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -0.068,
+    "gross_return_pct": -0.067,
+    "fees": 1.41,
+    "fees_saved": 20.41,
+    "fill_rate": 0.107,
+    "trades": 15,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.068,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m|tp10",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+10%",
+    "net_return_pct": -0.068,
+    "gross_return_pct": -0.067,
+    "fees": 1.41,
+    "fees_saved": 20.41,
+    "fill_rate": 0.107,
+    "trades": 15,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.068,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m|tp25",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+25%",
+    "net_return_pct": -0.068,
+    "gross_return_pct": -0.067,
+    "fees": 1.41,
+    "fees_saved": 20.41,
+    "fill_rate": 0.107,
+    "trades": 15,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.068,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m|tp50",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+50%",
+    "net_return_pct": -0.068,
+    "gross_return_pct": -0.067,
+    "fees": 1.41,
+    "fees_saved": 20.41,
+    "fill_rate": 0.107,
+    "trades": 15,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.068,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m|tp100",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+100%",
+    "net_return_pct": -0.068,
+    "gross_return_pct": -0.067,
+    "fees": 1.41,
+    "fees_saved": 20.41,
+    "fill_rate": 0.107,
+    "trades": 15,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.068,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "6m|tp25sl25",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -0.068,
+    "gross_return_pct": -0.067,
+    "fees": 1.41,
+    "fees_saved": 20.41,
+    "fill_rate": 0.107,
+    "trades": 15,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.068,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1m|hold",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -0.089,
+    "gross_return_pct": -0.089,
+    "fees": 0.0,
+    "fees_saved": 13.2,
+    "fill_rate": 0.043,
+    "trades": 8,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.089,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1m|tp10",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+10%",
+    "net_return_pct": -0.089,
+    "gross_return_pct": -0.089,
+    "fees": 0.0,
+    "fees_saved": 13.2,
+    "fill_rate": 0.043,
+    "trades": 8,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.089,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1m|tp25",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+25%",
+    "net_return_pct": -0.089,
+    "gross_return_pct": -0.089,
+    "fees": 0.0,
+    "fees_saved": 13.2,
+    "fill_rate": 0.043,
+    "trades": 8,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.089,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1m|tp50",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+50%",
+    "net_return_pct": -0.089,
+    "gross_return_pct": -0.089,
+    "fees": 0.0,
+    "fees_saved": 13.2,
+    "fill_rate": 0.043,
+    "trades": 8,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.089,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1m|tp100",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+100%",
+    "net_return_pct": -0.089,
+    "gross_return_pct": -0.089,
+    "fees": 0.0,
+    "fees_saved": 13.2,
+    "fill_rate": 0.043,
+    "trades": 8,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.089,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1m|tp25sl25",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -0.089,
+    "gross_return_pct": -0.089,
+    "fees": 0.0,
+    "fees_saved": 13.2,
+    "fill_rate": 0.043,
+    "trades": 8,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.089,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1d|hold",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -1.646,
+    "gross_return_pct": -1.384,
+    "fees": 262.68,
+    "fees_saved": 43.05,
+    "fill_rate": 0.018,
+    "trades": 51,
+    "closed": 12,
+    "win_rate": 0.833,
+    "max_dd_pct": 1.646,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1d|tp10",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+10%",
+    "net_return_pct": -1.646,
+    "gross_return_pct": -1.384,
+    "fees": 262.68,
+    "fees_saved": 43.05,
+    "fill_rate": 0.018,
+    "trades": 51,
+    "closed": 12,
+    "win_rate": 0.833,
+    "max_dd_pct": 1.646,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1d|tp25",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+25%",
+    "net_return_pct": -1.646,
+    "gross_return_pct": -1.384,
+    "fees": 262.68,
+    "fees_saved": 43.05,
+    "fill_rate": 0.018,
+    "trades": 51,
+    "closed": 12,
+    "win_rate": 0.833,
+    "max_dd_pct": 1.646,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1d|tp50",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+50%",
+    "net_return_pct": -1.646,
+    "gross_return_pct": -1.384,
+    "fees": 262.68,
+    "fees_saved": 43.05,
+    "fill_rate": 0.018,
+    "trades": 51,
+    "closed": 12,
+    "win_rate": 0.833,
+    "max_dd_pct": 1.646,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1d|tp100",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+100%",
+    "net_return_pct": -1.646,
+    "gross_return_pct": -1.384,
+    "fees": 262.68,
+    "fees_saved": 43.05,
+    "fill_rate": 0.018,
+    "trades": 51,
+    "closed": 12,
+    "win_rate": 0.833,
+    "max_dd_pct": 1.646,
+    "sharpe": null,
+    "adequate": false
+   },
+   {
+    "id": "1d|tp25sl25",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -1.646,
+    "gross_return_pct": -1.384,
+    "fees": 262.68,
+    "fees_saved": 43.05,
+    "fill_rate": 0.018,
+    "trades": 51,
+    "closed": 12,
+    "win_rate": 0.833,
+    "max_dd_pct": 1.646,
+    "sharpe": null,
+    "adequate": false
+   }
+  ],
+  "main": {
+   "net_return_pct": -3.181,
+   "gross_return_pct": -2.883,
+   "fees": 297.5,
+   "sharpe": null,
+   "max_dd_pct": 3.181,
+   "closed": 14
+  },
+  "top": "6m+|hold",
+  "adopted": [],
+  "not_adopted_because": [
+   "sample too small",
+   "Sharpe edge < 0.5"
+  ],
+  "main_rules": {
+   "tp": null,
+   "sl": null,
+   "bucket_weights": {
+    "1d": 1.0,
+    "1m": 1.0,
+    "6m": 1.0,
+    "6m+": 1.0
+   }
+  }
+ }
+}
