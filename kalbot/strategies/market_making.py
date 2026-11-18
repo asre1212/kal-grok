@@ -69,6 +69,8 @@ class MarketMaking(Strategy):
                 px = round(bid + 0.01, 2)
                 if px >= ask or px <= 0 or px >= 0.99:
                     continue
+                if not eng.quote_ok(self.name, m, side, px):
+                    continue
                 other = "no" if side == "yes" else "yes"
                 qty = base + held.get(other, 0) - held.get(side, 0)   # skew toward flattening
                 room = eng.room(self.name, m)

@@ -186,7 +186,7 @@ def weekly(now=None, write=True):
     end_eq = eq[-1]["equity"] if eq else config.STARTING_BANKROLL
     date = datetime.fromtimestamp(now, NY).strftime("%Y-%m-%d")
     # ---- expiry-bucket x exit-rule shadow books ----
-    from .variants import analysis as variant_analysis, robust_winner, adopt
+    from .variants import analysis as variant_analysis, robust_winner, adopt, tune_min_pop
     vstate = load_json(S / "variants.json.gz", {})
     combos = None
     if vstate:
@@ -199,13 +199,20 @@ def weekly(now=None, write=True):
             changes += [f"**main rules** {c} — {win['id']} beat main on net return "
                         f"({win['net_return_pct']:+.2f}% vs {an['main']['net_return_pct']:+.2f}%) and Sharpe "
                         f"({win['sharpe']} vs {an['main']['sharpe']}) with {win['closed']} closed trades" for c in adopted]
+        pop_changes, pop_why = tune_min_pop(an, state["main_rules"])
+        changes += [f"**selectivity** {c}" for c in pop_changes]
+        pop_rows = [{k: b[k] for k in ("label", "min_pop", "net_return_pct", "fees", "trades", "closed", "win_rate",
+                                       "max_dd_pct", "sharpe")} | {"calibration": b["calibration"]}
+                    for b in an.get("pop_books", [])]
         rows = [next(x for x in an["cells"] if x["id"] == vid) for vid in an["ranking"]]
         combos = {"ranking": [{k: c[k] for k in ("id", "bucket_label", "rule_label", "net_return_pct", "gross_return_pct",
                                                   "fees", "fees_saved", "fill_rate", "trades", "closed", "win_rate",
                                                   "max_dd_pct", "sharpe", "adequate")} for c in rows],
                   "main": {k: an["main"][k] for k in ("net_return_pct", "gross_return_pct", "fees", "sharpe", "max_dd_pct", "closed")},
                   "top": top["id"] if top else None, "adopted": adopted,
-                  "not_adopted_because": None if win else why_not, "main_rules": state.get("main_rules")}
+                  "not_adopted_because": None if win else why_not, "main_rules": state.get("main_rules"),
+                  "pop_books": pop_rows, "min_pop": state["main_rules"].get("min_pop"),
+                  "min_pop_changes": pop_changes, "min_pop_unchanged_because": pop_why}
 
     report = {
         "date": date, "generated": int(now), "equity_start": start_eq, "equity_end": end_eq,
@@ -274,6 +281,19 @@ def render_md(r):
             L += ["", "Adopted into the main book:"] + [f"- {a}" for a in cb["adopted"]]
         else:
             L += ["", f"Main rules unchanged — top combo `{cb['top']}` not adopted: {', '.join(cb['not_adopted_because'] or [])}."]
+    if cb and cb.get("pop_books"):
+        L += ["", f"## Selectivity: probability-of-profit books (main MIN_POP = {cb.get('min_pop')})", "",
+              "| Book | Net ret | Fees | Trades | Closed | Win | Avg POP → hit | MaxDD | Sharpe |",
+              "|---|---:|---:|---:|---:|---:|---:|---:|---:|"]
+        for b in cb["pop_books"]:
+            cal = b["calibration"]
+            L.append(f"| {b['label']} | {b['net_return_pct']:+.2f}% | ${b['fees']:,.2f} | {b['trades']} | {b['closed']} | "
+                     f"{_f(b['win_rate'], '{:.0%}')} | {_f(cal['avg_pop'], '{:.0%}')} → {_f(cal['hit_rate'], '{:.0%}')} | "
+                     f"{b['max_dd_pct']:.1f}% | {_f(b['sharpe'])} |")
+        if cb.get("min_pop_changes"):
+            L += [""] + [f"- {c}" for c in cb["min_pop_changes"]]
+        else:
+            L += ["", f"MIN_POP unchanged: {', '.join(cb.get('min_pop_unchanged_because') or [])}."]
     L += ["", "## Tuning notes", ""]
     for n, pc in r["param_changes"].items():
         for why in pc["reasons"]:

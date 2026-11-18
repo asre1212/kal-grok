@@ -9,6 +9,7 @@ const cls = (v) => v > 0 ? "up" : v < 0 ? "dn" : "mut";
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const fmtTime = (ts, opts = {}) => ts ? new Intl.DateTimeFormat("en-US", { timeZone: TZ, month: "short", day: "numeric", hour: "numeric", minute: "2-digit", ...opts }).format(new Date(ts * 1000)) + " ET" : "—";
 const nice = (s) => String(s).replace(/_/g, " ");
+const pp = (v) => v == null ? "—" : Math.round(v * 100) + "%";
 
 async function getJSON(name) {
   const r = await fetch(`data/${name}?t=${Date.now()}`, { cache: "no-store" });
@@ -51,6 +52,8 @@ function kpis(s) {
     ["Gross P&L (pre-fee)", signed(s.gross_pnl), cls(s.gross_pnl)],
     ["Limit fill rate", (() => { const o = s.orders || {}, r = (o.filled_qty || 0) + (o.cancelled_qty || 0); return r ? Math.round(100 * o.filled_qty / r) + "%" : "—"; })(), ""],
     ["Fees saved vs taker", money((s.orders || {}).fees_saved || 0), "up"], ["Order mode", s.order_mode || "—", "mut"],
+    ["Skipped this cycle", (() => { const g = (s.last_cycle || {}).selection; return g ? `${g.skipped} of ${g.seen}` : "—"; })(), "mut"],
+    ["Min POP to trade", (s.main_rules || {}).min_pop == null ? "off" : pp(s.main_rules.min_pop), ""],
   ];
   $("#kpis").innerHTML = k.map(([l, v, c]) => `<div class="kpi"><span>${l}</span><b class="${c}">${v}</b></div>`).join("");
 }
@@ -67,7 +70,7 @@ function positions(list, filter = "all") {
     <b class="${cls(p.pnl)}">${signed(p.pnl)}</b></div>
     <div class="meta"><span class="pill ${p.side}">${p.side.toUpperCase()}</span><span class="pill s">${nice(p.strategy)}</span>
     ${p.qty.toLocaleString()} @ ${(p.avg_cost * 100).toFixed(1)}¢ → mark ${p.mark == null ? "—" : (p.mark * 100).toFixed(1) + "¢"}
-    · value ${money(p.value)}${p.p_model != null ? ` · model ${(p.p_model * 100).toFixed(0)}%` : ""}</div>
+    · value ${money(p.value)}${p.p_model != null ? ` · model ${(p.p_model * 100).toFixed(0)}%` : ""}${p.pop != null ? ` · <span class="pill pop">POP ${pp(p.pop)}</span>` : ""}</div>
     <div class="meta">${esc(p.ticker)} · closes ${fmtTime(p.close, { year: "numeric" })}</div></div>`).join("") : '<div class="empty">No open positions</div>');
   $("#pf").onchange = (e) => positions(POS, e.target.value);
 }
@@ -77,7 +80,7 @@ function trades(list) {
   el.innerHTML = list.length ? list.slice(0, 150).map((t) => `<div class="item">
     <div class="row"><div class="title">${esc(t.title || t.ticker)}</div>${t.pnl != null ? `<b class="${cls(t.pnl)}">${signed(t.pnl)}</b>` : ""}</div>
     <div class="meta"><span class="pill">${t.action}</span><span class="pill ${t.side}">${String(t.side).toUpperCase()}</span><span class="pill s">${nice(t.strategy)}</span>
-    ${t.qty} @ ${(t.price * 100).toFixed(1)}¢ · fee ${money(t.fee)}${t.maker ? " · maker" : ""}</div>
+    ${t.qty} @ ${(t.price * 100).toFixed(1)}¢ · fee ${money(t.fee)}${t.maker ? " · maker" : ""}${t.pop != null ? ` · <span class="pill pop">POP ${pp(t.pop)}</span>` : ""}</div>
     <div class="meta">${fmtTime(t.ts)}${t.note ? " · " + esc(t.note) : ""}</div></div>`).join("") : '<div class="empty">No trades yet</div>';
 }
 
@@ -127,7 +130,9 @@ function lastRun(s) {
   const c = s.last_cycle || {};
   $("#tab-run").innerHTML = `<div class="item"><div class="meta">${fmtTime(c.ts)} · ${(c.events_scanned || 0).toLocaleString()} events · ${(c.markets_scanned || 0).toLocaleString()} markets scanned ·
     ${(c.universe || 0).toLocaleString()} tradable · ${c.new_trades || 0} new trades · ${c.settled || 0} settlements · ${c.orderbooks || 0} orderbooks · ${c.seconds || 0}s
-    ${c.halted ? " · <b class='dn'>circuit breaker: directional trading halted</b>" : ""}</div></div>
+    ${c.halted ? " · <b class='dn'>circuit breaker: directional trading halted</b>" : ""}</div>
+    ${c.selection ? `<div class="meta">Selectivity (min POP ${pp(c.selection.min_pop)}): ${c.selection.seen} candidates · ${c.selection.passed} passed · ${c.selection.taken} opened · ${c.selection.skipped} skipped
+      (${esc(Object.entries(c.selection.rejected || {}).map(([k, v]) => `${nice(k)} ${v}`).join(", ") || "none")}) · avg POP opened ${pp(c.selection.avg_pop_taken)}</div>` : ""}</div>
     <div class="item"><div class="log">${esc(Object.entries(c.notes || {}).map(([k, v]) => `${k}: ${v}`).join("\n"))}\n\n${esc((c.log || []).join("\n")) || "No decisions logged."}</div></div>`;
 }
 
@@ -187,6 +192,31 @@ function detail(c) {
     </div></div>`;
 }
 
+function popSection() {
+  const books = AN.pop_books || [];
+  if (!books.length) return "";
+  const mn = AN.main, sel = AN.select || {};
+  const row = (b, cl) => {
+    const cal = b.calibration || {}, g = b.last_gate || {};
+    return `<tr class="${cl || ""}"><td>${esc(b.label)}</td><td class="${cls(b.net_return_pct)}">${pct(b.net_return_pct)}</td>
+      <td>${pp(b.win_rate)}</td><td>${b.trades}</td><td>${money(b.fees, 0)}</td>
+      <td>${pp(cal.avg_pop)} → ${pp(cal.hit_rate)}<small class="mut"> (${cal.n || 0})</small></td>
+      <td>${g.seen == null ? "—" : `${g.skipped}/${g.seen}`}</td></tr>`;
+  };
+  const mainRow = { ...mn, label: `Main book (POP ≥ ${pp(mn.min_pop)}${mn.pop_since ? ", since " + fmtTime(mn.pop_since, { hour: undefined, minute: undefined }).replace(" ET", "") : ""})`, last_gate: mn.last_gate };
+  const colors = ["#8a98ad", "#38bdf8", "#a78bfa", "#f59e0b"];
+  setTimeout(() => { const el = $("#popcmp"); if (el) curves(el, [{ label: "Main book", pts: mn.curve, color: "#22c55e", w: 2.6 },
+    ...books.map((b, i) => ({ label: b.label, pts: b.curve, color: colors[i % 4] }))]); }, 0);
+  return `<div class="item"><div class="title">Selectivity: probability of profit (POP)</div>
+    <div class="meta" style="margin:4px 0 6px">Main book opens only trades with estimated POP ≥ ${pp(mn.min_pop)}, expected profit ≥ ${money(sel.min_ev ?? 0.02)}/contract
+      and ≥ ${pp(sel.min_edge_to_cost)} of cost after fees; best ${sel.max_new_per_cycle ?? "—"} per cycle by EV×POP, sized up to ${sel.kelly_boost_max ?? 1.5}× Kelly at POP ≥ ${pp(sel.kelly_boost_pop)}.
+      The main book's totals include its trades from before the filter was switched on. Each row below is its own $100k book (started with the filter) on the same markets, rules, fees and fill model — only the POP filter differs. Net of all fees.</div>
+    <div class="ptab"><table><tr><th>Book</th><th>Net</th><th>Win</th><th>Fills</th><th>Fees</th><th>Avg POP → hit</th><th>Skipped (last)</th></tr>
+      ${row(mainRow, "main")}${books.map((b) => row(b)).join("")}</table></div>
+    <div class="meta" style="margin-top:6px">“Avg POP → hit” is the calibration check: predicted chance of profit vs how often closed trades actually made money.</div>
+    <div id="popcmp" style="margin-top:6px"></div></div>`;
+}
+
 function renderAnalysis() {
   const el = $("#tab-analysis");
   if (!AN || !AN.cells.length) { el.innerHTML = '<div class="empty">Shadow portfolios start with the next cycle.</div>'; return; }
@@ -214,6 +244,7 @@ function renderAnalysis() {
     </table></div>
     <div class="meta" style="margin:-4px 0 8px">Each cell is a separate $100k paper book: same strategies & risk rules, entries limited to that expiry bucket, exits by that rule. All returns are NET of entry + exit fees. Tap a cell for details.</div>
     ${detail(sel)}
+    ${popSection()}
     <div class="item"><div class="title">Equity: main vs best per expiry bucket</div><div id="cmp"></div></div>`;
   curves($("#cmp"), [{ label: "Main book", pts: mn.curve, color: "#22c55e", w: 2.6 },
     ...perBucket.map((c, i) => ({ label: `${c.bucket_label} · ${c.rule_label}`, pts: c.curve, color: colors[i % 4] }))]);

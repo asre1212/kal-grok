@@ -19,7 +19,8 @@ from .strategies import build_strategies
 from .strategies.arbitrage import is_exhaustive_buckets
 from .exits import apply_exit_rules
 from .orders import process_resting
-from .variants import run_variants, settle_all, analysis
+from .variants import run_variants, run_pop_books, settle_all, analysis
+from .quality import hit_stats
 
 S = config.STATE_DIR
 
@@ -42,6 +43,9 @@ def load_state():
         for pk, pv in v.items():
             st["params"][k].setdefault(pk, pv)
     st.setdefault("main_rules", json_copy(config.DEFAULT_MAIN_RULES))
+    if "min_pop" not in st["main_rules"]:
+        st["main_rules"]["min_pop"] = config.SELECT["min_pop"]
+        st["main_rules"]["pop_since"] = int(time.time())
     for b, w in config.DEFAULT_MAIN_RULES["bucket_weights"].items():
         st["main_rules"]["bucket_weights"].setdefault(b, w)
     for k, w in config.INITIAL_ALLOCATION.items():
@@ -144,7 +148,7 @@ def run_cycle(trade=True, client=None, verbose=True):
             state["params"]["expiry_convergence"]["beta"] = round(min(hi, max(lo, b_s)), 3)
 
     state["_run_notes"] = {}
-    shared = {}
+    shared = {"hit_stats": hit_stats(state.get("closed", []))}   # main book's track record, shared by all books
     rules = state["main_rules"]
     eng = Engine(state, pf, dict(main_markets), client=client, history=history, now=now,
                  shared=shared, rules=rules)
@@ -168,6 +172,11 @@ def run_cycle(trade=True, client=None, verbose=True):
                 s.run(eng)
             except Exception as e:
                 eng.log.append(f"{s.name}: run error {e!r}")
+        eng.flush_pending()
+        g = eng.gate_summary()
+        eng.log.append(f"POP gate (min {g['min_pop']}): {g['seen']} candidates, {g['passed']} passed, "
+                       f"{g['taken']} opened, {g['skipped']} skipped {g['rejected']}; "
+                       f"MM quotes skipped {g['quotes_skipped']}/{g['quotes_seen']}")
     for k, p in pf.positions.items():
         if p["ticker"] in markets:
             pf.mark(k, markets[p["ticker"]])
@@ -175,6 +184,9 @@ def run_cycle(trade=True, client=None, verbose=True):
     # shadow variants (expiry bucket x exit rule), same snapshot + shared orderbook cache
     vsum = run_variants(vstate, markets, state, meta, client, history, now, shared, strategies,
                         trade=trade, last_run=state.get("last_run"))
+    # POP comparison books (all trades vs POP >= 0.60 / 0.70 / 0.80) on the main book's universe
+    psum = run_pop_books(vstate, markets, main_markets, state, meta, client, history, now, shared, strategies,
+                         trade=trade, last_run=state.get("last_run"))
 
     # history / calibration (main universe only, so the main book's inputs are unchanged)
     main_markets = {t: m for t, m in main_markets.items() if not m.get("_held_only")}
@@ -209,6 +221,7 @@ def run_cycle(trade=True, client=None, verbose=True):
         "orderbooks": eng.ob_calls, "api_calls": client.calls, "settled": n_settled,
         "calibration_added": n_cal, "new_trades": sum(1 for x in eng.log if " BUY " in x or "BASKET" in x or "FILL" in x),
         "log": eng.log[-200:], "notes": state.pop("_run_notes", {}),
+        "selection": eng.gate_summary(), "pop_books": psum,
         "drawdown": round(eng.drawdown, 4), "halted": eng.halt_directional,
         "seconds": round(time.time() - t0, 1),
         "variants": {"books": len(vsum), "new_trades": sum(v["new"] for v in vsum.values()),

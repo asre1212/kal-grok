@@ -50,7 +50,7 @@ def entry_price(m, side):
 
 
 def post(eng, strat, m, side, action, price, qty, p_model=None, kind="entry", key=None,
-         max_age=None, ff=None, note=""):
+         max_age=None, ff=None, note="", pop=None):
     bid, ask, _ = side_px(m, side)
     o = {"id": f"{int(eng.now or 0)}-{next(_ids)}", "strategy": strat, "ticker": m["t"], "side": side,
          "action": action, "price": round(price, 2), "qty": int(qty), "filled": 0, "vol": m.get("vol", 0),
@@ -59,6 +59,8 @@ def post(eng, strat, m, side, action, price, qty, p_model=None, kind="entry", ke
          "event": m.get("e"), "series": m.get("s"), "cat": m.get("cat")}
     if ff is not None:
         o["ff"] = ff
+    if pop is not None:
+        o["pop"] = round(pop, 4)
     mid = (m["yb"] + m["ya"]) / 2
     o["p_mkt"] = round(mid if side == "yes" else 1 - mid, 4)
     eng.pf.p["resting"].append(o)
@@ -108,7 +110,8 @@ def process_resting(eng):
             base_fee = taker_fee(q, o.get("ref") or px, m.get("fm", 1.0))
             if o["action"] == "buy":
                 ok = pf.buy(o["strategy"], m, o["side"], q, round(q * px, 4), mf, p_model=o.get("p_model"),
-                            maker=True, note=f"limit fill {o.get('note', '')}".strip(), p_mkt=o.get("p_mkt"))
+                            maker=True, note=f"limit fill {o.get('note', '')}".strip(), p_mkt=o.get("p_mkt"),
+                            pop=o.get("pop"))
                 improve = ((o.get("ref") or px) - px) * q
             else:
                 pos = pf.positions.get(o.get("key"))

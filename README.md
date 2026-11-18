@@ -140,6 +140,32 @@ size). Every change is logged with the numbers behind it.
 * **Conservative fills**: buys at the ask, sells at the bid, walking real displayed depth, never more
   than displayed size, fees charged per level.
 
+## Selectivity: only high probability-of-profit trades (`kalbot/quality.py`)
+
+Every candidate entry gets a **POP** (estimated chance the trade ends in profit after fees) and an
+**EV** (expected net profit per contract after entry + exit fees):
+
+1. Start from the strategy's probability and keep only part of its claimed edge over the market mid
+   (80%; 50% for momentum/mean-reversion; 100% for the NWS weather model, which is already blended).
+2. Scale by the strategy's realized/predicted hit rate on its last 300 closed trades, shrunk toward
+   1.0 with a Beta prior of 20 pseudo-trades (bounded 0.70–1.10).
+3. Cut the edge by up to 30% for markets 7→120 days from closing; subtract a spread penalty
+   (0.5 × spread beyond 3¢) and 2 pts for thin markets.
+4. Hold-to-settle trades profit iff the side wins, so POP = the adjusted probability. Drift trades
+   exit at the mark, so POP = Φ(EV / σ), σ = max(6¢, predicted move). Arbitrage baskets: 0.99.
+
+Main-book gate (defaults in `config.SELECT`): POP ≥ **0.65**, EV ≥ **2¢/contract**, EV/cost ≥ **4%**.
+Survivors are ranked by EV × POP and only the best **12** open per cycle. Kelly size × 1.0 at the
+threshold rising linearly to × 1.5 at POP ≥ 0.90, still inside every exposure cap. Market-making
+quotes are only posted on sides that clear the same gate. Each cycle logs candidates seen / passed /
+opened / skipped with reasons (Last run tab, `summary.json → last_cycle.selection`).
+
+Comparison books (each $100k, same universe, rules, fee and limit-fill model): **All trades** (old
+behaviour) vs **POP ≥ 0.60 / 0.70 / 0.80**, shown in the Analysis tab with a calibration check
+(average predicted POP vs realized hit rate). The weekly review moves the main book's MIN_POP one
+0.05 step (bounded 0.55–0.85) toward a POP book only when it beats the book nearest the current
+setting under the same sample-size / Sharpe / return / drawdown guardrails used for combo adoption.
+
 ## Weekly re-evaluation (`python -m kalbot.evaluate`, Sundays)
 
 For each strategy: weekly realized + mark-to-market P&L, return on sleeve, annualized Sharpe and

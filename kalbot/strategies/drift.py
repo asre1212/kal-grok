@@ -73,7 +73,11 @@ class Drift(Strategy):
             m = eng.markets.get(t)
             if not m or not m.get("exp") or (m["exp"] - eng.now) < 86400:
                 continue
-            fair = drift_signal(hist, P["kappa"])
+            # include the CURRENT snapshot: history is only updated after trading, so without it the
+            # "latest move" is a cycle old and fair value is anchored to a stale mid
+            cur = [int((eng.now or 0) // 3600), int(round(m["yb"] * 100)), int(round(m["ya"] * 100)), int(m.get("vol", 0))]
+            fair = drift_signal(list(hist) + [cur] if not hist or hist[-1][0] != cur[0] else list(hist[:-1]) + [cur],
+                                P["kappa"])
             if fair is None:
                 continue
             if fair - m["ya"] > 0:

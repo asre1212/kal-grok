@@ -7,6 +7,7 @@ from .execution import Book, simulate_buy, simulate_sell
 from .fees import fee_per_contract
 from .sizing import kelly_contracts, cap_contracts
 from .orders import entry_price, post as post_order, has_resting, stats as order_stats
+from . import quality
 
 
 class Engine:
@@ -28,6 +29,13 @@ class Engine:
         self.shared.setdefault("ob_calls", 0)
         self.books = self.shared["books"]
         self.rules = rules or {}
+        # POP selectivity: None = take every candidate (old behaviour); else gate + rank + top-N
+        self.min_pop = self.rules.get("min_pop")
+        self.hit_stats = self.shared.get("hit_stats") or {}
+        self.pending = []
+        self.gate = {"min_pop": self.min_pop, "seen": 0, "passed": 0, "taken": 0, "skipped": 0,
+                     "rejected": {}, "quotes_seen": 0, "quotes_skipped": 0, "avg_pop_taken": None}
+        self._pops_taken = []
         self.log = []                        # human-readable decisions
         self.params = state["params"]
         self.alloc = state["allocation"]
@@ -119,17 +127,122 @@ class Engine:
         c = self.claimed.get(m["t"])
         return c is not None and c != side
 
-    # ---------- directional taker trade ----------
+    # ---------- POP scoring / gating ----------
+    def _early_exit(self):
+        return bool(self.rules.get("tp") or self.rules.get("sl"))
+
+    def _entry_quote(self, m, side, urgent):
+        """(mode, price, entry fee per contract) we'd use for this entry right now."""
+        hours = ((m.get("exp") or m.get("close") or 0) - (self.now or 0)) / 3600
+        if config.ORDER_MODE == "limit" and not urgent and hours > config.LIMIT["taker_hours"]:
+            q = entry_price(m, side)
+            if q is None:
+                return None
+            ft = m.get("ft", "quadratic")
+            mfpc = fee_per_contract(q, m.get("fm", 1.0)) * (config.MAKER_RATE / config.TAKER_RATE if "maker" in (ft or "") else 0.0)
+            return "limit", q, mfpc
+        ask = m["ya"] if side == "yes" else m["na"]
+        if not (0 < ask < 1):
+            return None
+        return "taker", ask, fee_per_contract(ask, m.get("fm", 1.0))
+
+    def score(self, strat, m, side, p_model, urgent=False):
+        eq = self._entry_quote(m, side, urgent)
+        if eq is None:
+            return None
+        mode, px, fpc = eq
+        q = quality.estimate(strat, m, side, p_model, px, fpc, now=self.now, stats=self.hit_stats,
+                             early_exit=self._early_exit())
+        q["mode"], q["price"] = mode, px
+        return q
+
+    def _reject(self, reason, n=1):
+        r = self.gate["rejected"]
+        r[reason] = r.get(reason, 0) + n
+        self.gate["skipped"] += n
+
+    def quote_ok(self, strat, m, side, px):
+        """Market-making quotes in selective books: only the side whose POP clears the bar."""
+        if self.min_pop is None:
+            return True
+        self.gate["quotes_seen"] += 1
+        q = quality.estimate(strat, m, side, quality.side_mid(m, side), px, 0.0,
+                             now=self.now, stats=self.hit_stats, early_exit=self._early_exit())
+        if quality.gate(q, self.min_pop):
+            self.gate["quotes_skipped"] += 1
+            return False
+        return True
+
+    # ---------- directional trade ----------
     def take(self, strat, m, side, p_model, min_edge, note="", urgent=False):
         """Kelly-sized buy of `side` if edge after fees >= min_edge. Posts a passive limit order
-        (maker) unless the trade is time-critical (urgent / expiring within LIMIT['taker_hours'])."""
+        (maker) unless the trade is time-critical (urgent / expiring within LIMIT['taker_hours']).
+        In a selective book (rules['min_pop'] set) the candidate is only scored and queued here;
+        flush_pending() opens the best ones after all strategies have run."""
         if self.halt_directional or not self.active(strat) or self.conflict(m, side):
             return None
         if self.holds(strat, ticker=m["t"]) or self.cooling(m["t"]) or has_resting(self.pf, strat, m["t"]):
             return None   # don't re-buy the same displayed liquidity / just-exited markets
+        q = self.score(strat, m, side, p_model, urgent)
+        if q is None:
+            return None
+        self.gate["seen"] += 1
+        if self.min_pop is None:
+            pos = self._execute(strat, m, side, p_model, min_edge, note, urgent, q["pop"], 1.0)
+            if pos:
+                self._took(q["pop"])
+            return pos
+        reason = quality.gate(q, self.min_pop)
+        if reason:
+            self._reject(reason)
+            return None
+        if any(c["m"]["t"] == m["t"] and c["strat"] == strat for c in self.pending):
+            return None
+        self.gate["passed"] += 1
+        c = {"strat": strat, "m": m, "side": side, "p_model": p_model, "min_edge": min_edge,
+             "note": note, "urgent": urgent, "q": q, "score": quality.score(q)}
+        self.pending.append(c)
+        return c
+
+    def _took(self, pop):
+        self.gate["taken"] += 1
+        if pop is not None:
+            self._pops_taken.append(pop)
+            self.gate["avg_pop_taken"] = round(sum(self._pops_taken) / len(self._pops_taken), 4)
+
+    def flush_pending(self):
+        """Open queued candidates best-first (EV x POP), at most SELECT['max_new_per_cycle']."""
+        cands = sorted(self.pending, key=lambda c: -c["score"])
+        self.pending = []
+        cap = config.SELECT["max_new_per_cycle"]
+        opened = 0
+        for c in cands:
+            if opened >= cap:
+                self._reject("rank_cap")
+                continue
+            if self.conflict(c["m"], c["side"]) or self.holds(c["strat"], ticker=c["m"]["t"]):
+                self._reject("conflict")
+                continue
+            pop = c["q"]["pop"]
+            res = self._execute(c["strat"], c["m"], c["side"], c["p_model"], c["min_edge"],
+                                (c["note"] + f" POP={pop:.2f}").strip(), c["urgent"], pop,
+                                quality.kelly_mult(pop, self.min_pop))
+            if res:
+                opened += 1
+                self._took(pop)
+            else:
+                self._reject("no_room_or_fill")
+        return opened
+
+    def gate_summary(self):
+        g = dict(self.gate)
+        g["rejected"] = dict(sorted(g["rejected"].items(), key=lambda kv: -kv[1]))
+        return g
+
+    def _execute(self, strat, m, side, p_model, min_edge, note="", urgent=False, pop=None, kmult=1.0):
         hours = ((m.get("exp") or m.get("close") or 0) - (self.now or 0)) / 3600
         if config.ORDER_MODE == "limit" and not urgent and hours > config.LIMIT["taker_hours"]:
-            return self.post_entry(strat, m, side, p_model, min_edge, note)
+            return self.post_entry(strat, m, side, p_model, min_edge, note, pop=pop, kmult=kmult)
         ask = m["ya"] if side == "yes" else m["na"]
         if not (0 < ask < 1):
             return None
@@ -140,7 +253,7 @@ class Engine:
             return None
         qty = kelly_contracts(p_model, ask, fpc, self.sleeve(strat),
                               config.RISK["kelly_fraction"], self.dd_mult)
-        qty = int(qty * self.bucket_weight(m))
+        qty = int(qty * self.bucket_weight(m) * kmult)
         qty = cap_contracts(qty, ask + fpc, self.room(strat, m))
         if qty < config.RISK["min_contracts"]:
             return None
@@ -155,7 +268,7 @@ class Engine:
             return None
         mid_yes = (m["yb"] + m["ya"]) / 2
         p_mkt = round(mid_yes if side == "yes" else 1 - mid_yes, 4)
-        pos = self.pf.buy(strat, m, side, fill["qty"], fill["cost"], fill["fee"], p_model, note=note, p_mkt=p_mkt)
+        pos = self.pf.buy(strat, m, side, fill["qty"], fill["cost"], fill["fee"], p_model, note=note, p_mkt=p_mkt, pop=pop)
         if pos:
             st = order_stats(self.pf)
             st["taker_fills"] += 1
@@ -163,10 +276,11 @@ class Engine:
             self._book_exposure(strat, m, fill["cost"] + fill["fee"])
             self.claimed[m["t"]] = side
             self.log.append(f"{strat}: BUY {fill['qty']} {side.upper()} {m['t']} @ {fill['avg']:.2f} "
-                            f"(p={p_model:.3f}, edge={real_edge:.3f}) {note}")
+                            f"(p={p_model:.3f}, edge={real_edge:.3f}"
+                            f"{'' if pop is None else f', POP={pop:.2f}'}) {note}")
         return pos
 
-    def post_entry(self, strat, m, side, p_model, min_edge, note=""):
+    def post_entry(self, strat, m, side, p_model, min_edge, note="", pop=None, kmult=1.0):
         q = entry_price(m, side)
         if q is None:
             return None
@@ -177,11 +291,11 @@ class Engine:
         if edge < min_edge or (gross > 0 and mfpc / gross > config.RISK["max_fee_to_edge"]):
             return None
         qty = kelly_contracts(p_model, q, mfpc, self.sleeve(strat), config.RISK["kelly_fraction"], self.dd_mult)
-        qty = int(qty * self.bucket_weight(m))
+        qty = int(qty * self.bucket_weight(m) * kmult)
         qty = cap_contracts(qty, q + mfpc, self.room(strat, m))
         if qty < config.RISK["min_contracts"]:
             return None
-        o = post_order(self, strat, m, side, "buy", q, qty, p_model=p_model, note=note)
+        o = post_order(self, strat, m, side, "buy", q, qty, p_model=p_model, note=note, pop=pop)
         self._book_exposure(strat, m, qty * q)
         self.claimed[m["t"]] = side
         self.log.append(f"{strat}: POST LIMIT BUY {qty} {side.upper()} {m['t']} @ {q:.2f} "
@@ -217,8 +331,13 @@ class Engine:
                 if profit / q >= min_profit:
                     if cost > self.pf.cash - config.RISK["min_cash_reserve_frac"] * self.equity:
                         return None
+                    arb_pop = config.SELECT["arb_pop"]
+                    self.gate["seen"] += 1
+                    self.gate["passed"] += 1
+                    self._took(arb_pop)
                     for (m, side, b), fl in zip(books, fills):
-                        self.pf.buy(strat, m, side, q, fl["cost"], fl["fee"], p_model=None, group=group, note=note)
+                        self.pf.buy(strat, m, side, q, fl["cost"], fl["fee"], p_model=None, group=group, note=note,
+                                    pop=arb_pop)
                         st = order_stats(self.pf)
                         st["taker_fills"] += 1
                         st["taker_fees"] = round(st["taker_fees"] + fl["fee"], 4)

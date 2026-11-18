@@ -77,10 +77,41 @@ EXIT_RULES = [
     ("tp25sl25", "+25% / −25% SL", 0.25, 0.25),
 ]
 MAIN_TP_STEPS = [None, 0.10, 0.25, 0.50, 1.00]
-DEFAULT_MAIN_RULES = {"tp": None, "sl": None,
+DEFAULT_MAIN_RULES = {"tp": None, "sl": None, "min_pop": 0.65,
                       "bucket_weights": {"1d": 1.0, "1m": 1.0, "6m": 1.0, "6m+": 1.0}}
 BUCKET_WEIGHT_BOUNDS = (0.5, 1.5)
 EXIT_COOLDOWN_HOURS = 24
+
+
+# ---------- Selectivity: only open high probability-of-profit (POP) trades (kalbot/quality.py) ----------
+# The main book gates every new entry on these; the weekly review may move min_pop (main_rules)
+# one step at a time inside MIN_POP_BOUNDS when the POP shadow books show robust evidence.
+SELECT = dict(
+    min_pop=0.65,             # estimated probability the trade ends in profit, after fees
+    min_ev=0.02,              # min expected net profit per contract ($) after entry + exit fees
+    min_edge_to_cost=0.04,    # min expected net profit / all-in cost per contract
+    max_new_per_cycle=12,     # top-N candidates (ranked by EV x POP) opened per cycle
+    kelly_boost_max=1.5,      # Kelly multiplier at kelly_boost_pop and above (1.0 at min_pop)
+    kelly_boost_pop=0.90,
+    model_trust=0.80,         # share of a strategy's claimed edge over the market that we believe
+    time_shrink=0.30,         # extra edge haircut, ramping from 7 to 120 days to close
+    spread_penalty=0.50,      # POP haircut per $ of spread beyond 3c
+    thin_penalty=0.02,        # POP haircut for thin markets (24h vol < 50 and OI < 500)
+    horizon_sigma=0.06,       # price-move sd over a drift trade's holding period
+    prior_strength=20,        # Beta prior pseudo-trades for each strategy's realized hit rate
+    hit_window=300,           # most recent closed trades used for hit rates
+    hit_factor_bounds=(0.70, 1.10),
+    arb_pop=0.99,             # locked-in baskets
+)
+MIN_POP_BOUNDS = (0.55, 0.85)
+MIN_POP_STEP = 0.05
+# POP comparison books: (id, label, min_pop) -- each its own $100k, main-book universe and rules
+POP_BOOKS = [
+    ("all", "All trades (no POP filter)", None),
+    ("60", "POP ≥ 0.60", 0.60),
+    ("70", "POP ≥ 0.70", 0.70),
+    ("80", "POP ≥ 0.80", 0.80),
+]
 
 
 def bucket_of(m, now):

@@ -47,7 +47,7 @@ class Portfolio:
         self.st["trades"] = self.st["trades"][-1500:]
 
     # ---------- trading ----------
-    def buy(self, strategy, m, side, qty, cost, fee, p_model=None, group=None, maker=False, note="", p_mkt=None):
+    def buy(self, strategy, m, side, qty, cost, fee, p_model=None, group=None, maker=False, note="", p_mkt=None, pop=None):
         if qty <= 0:
             return None
         total = cost + fee
@@ -64,12 +64,17 @@ class Portfolio:
                 "title": m.get("ti"), "etitle": m.get("et"), "close": m.get("close"), "exp": m.get("exp"),
                 "opened": int(time.time()), "p_model": p_model, "group": group, "mark": None,
                 "fm": m.get("fm", 1.0), "ft": m.get("ft", "quadratic"), "runs_held": 0, "p_mkt": p_mkt,
+                "pop": pop,
             }
         # quantity-weighted model prob
         if p_model is not None and pos.get("p_model") is not None and pos["qty"] > 0:
             pos["p_model"] = (pos["p_model"] * pos["qty"] + p_model * qty) / (pos["qty"] + qty)
         elif p_model is not None:
             pos["p_model"] = p_model
+        if pop is not None and pos.get("pop") is not None and pos["qty"] > 0:
+            pos["pop"] = round((pos["pop"] * pos["qty"] + pop * qty) / (pos["qty"] + qty), 4)
+        elif pop is not None:
+            pos["pop"] = round(pop, 4)
         pos["qty"] += int(qty)
         pos["cost"] = round(pos["cost"] + total, 4)
         s = self.stats(strategy)
@@ -78,6 +83,7 @@ class Portfolio:
         self._log({"strategy": strategy, "ticker": m["t"], "title": m.get("ti"), "action": "BUY",
                    "side": side, "qty": int(qty), "price": round(cost / qty, 4), "fee": round(fee, 4),
                    "p_model": None if p_model is None else round(p_model, 4), "maker": maker,
+                   "pop": None if pop is None else round(pop, 4),
                    "group": group, "note": note})
         return pos
 
@@ -130,7 +136,7 @@ class Portfolio:
             "strategy": pos["strategy"], "ticker": pos["ticker"], "side": pos["side"],
             "qty": int(qty), "pnl": round(pnl, 2), "p_model": pos.get("p_model"),
             "outcome": outcome, "cat": pos.get("cat"), "ts": int(time.time()), "group": pos.get("group"),
-            "p_mkt": pos.get("p_mkt"),
+            "p_mkt": pos.get("p_mkt"), "pop": pos.get("pop"),
         })
         self.st["closed"] = self.st["closed"][-3000:]
 

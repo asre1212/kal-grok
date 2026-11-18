@@ -50,3 +50,7 @@ footer{color:var(--mut);font-size:11px;text-align:center;padding:20px 8px 40px}
 .legend{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--mut);margin-top:4px}.legend i{display:inline-block;width:10px;height:3px;margin-right:4px;vertical-align:middle}
 #toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(120px);background:var(--card2);border:1px solid var(--acc);color:var(--txt);padding:10px 14px;border-radius:12px;font-size:13px;transition:transform .3s;z-index:20;max-width:90vw}
 #toast.show{transform:translateX(-50%) translateY(0)}
+.ptab{overflow-x:auto}.ptab table{width:100%;min-width:460px;border-collapse:collapse;font-size:12px}
+.ptab th{font-size:10px;color:var(--mut);font-weight:600;text-align:right;padding:4px 3px;border-bottom:1px solid var(--line,#1e293b)}
+.ptab td{text-align:right;padding:6px 3px;border-bottom:1px solid var(--line,#1e293b)}.ptab td:first-child,.ptab th:first-child{text-align:left}
+.ptab tr.main td{font-weight:700}.pill.pop{background:rgba(34,197,94,.18);color:#86efac}

@@ -60,6 +60,7 @@ def publish(state, strategies, calibration=None):
         "gross_pnl": round(equity - start + pfs["fees"], 2),
         "orders": pfs.get("orders", {}), "order_mode": config.ORDER_MODE,
         "main_rules": state.get("main_rules"),
+        "select": {k: v for k, v in config.SELECT.items() if not isinstance(v, tuple)},
     }
     save_json(D / "summary.json", summary)
 
@@ -71,7 +72,7 @@ def publish(state, strategies, calibration=None):
             "strategy": p["strategy"], "ticker": p["ticker"], "title": p.get("title"), "event": p.get("etitle"),
             "side": p["side"], "qty": p["qty"], "avg_cost": round(p["cost"] / p["qty"], 4),
             "cost": round(p["cost"], 2), "mark": mark, "bid": p.get("bid"), "p_mkt": p.get("p_mkt"), "value": None if val is None else round(val, 2),
-            "pnl": None if val is None else round(val - p["cost"], 2), "p_model": p.get("p_model"),
+            "pnl": None if val is None else round(val - p["cost"], 2), "p_model": p.get("p_model"), "pop": p.get("pop"),
             "close": p.get("exp") or p.get("close"), "group": p.get("group"), "url": _kalshi_url(p),
             "category": p.get("cat"),
         })
