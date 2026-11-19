@@ -1,367 +1,15 @@
 {
- "ts": 1794991285,
+ "ts": 1795124827,
  "fees": {
-  "KXLALIGAGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXATPMATCH": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEMMYCACTR": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXUSOPEN": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBF5TOTAL": [
-   "quadratic",
-   0.5
-  ],
-  "KXB200MON": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLNFCSOUTH": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEPLTOP4": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAFACC": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLTOTAL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXUSOWOMENSINGLES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXB200MAX": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLDPOTY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXB200MS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEMMYDSERIES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXBALLONDOR": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEGGS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXUEFACL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLAFCCHAMP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXLAYOFFSYINFO": [
-   "quadratic",
-   0.0
-  ],
-  "KXWNBAGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLAFCEAST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXF1RACEPODIUM": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXH100MS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXSUPERBOWLHEADLINE": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXDOED": [
-   "quadratic",
-   0.0
-  ],
-  "KXEMMYCACTO": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXCPIYOY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXWNBA": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXUCL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLNFCWEST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMVECROSSCATEGORY-SHARD1": [
-   "quadratic_with_combo_maker_fees",
-   1.0
-  ],
-  "KXMLBTB": [
-   "quadratic",
-   0.5
-  ],
-  "KXWMENSINGLES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXLALIGA": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXWWOMENSINGLES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEMMYDACTR": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXA100W": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBEXTRAS": [
-   "quadratic",
-   0.5
-  ],
-  "KXGDPYEAR": [
-   "quadratic",
-   0.0
-  ],
-  "KXEXPAND": [
-   "quadratic",
-   0.0
-  ],
-  "KXA100Q": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXFOMENSINGLES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXCITRINI": [
-   "quadratic",
-   0.0
-  ],
-  "KXMLBF3": [
-   "quadratic",
-   0.5
-  ],
-  "KXNASCAR": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAFGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLAFCWEST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXWCGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXPGASOLHEIM": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXH200MON": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXA100WS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNEXTIRANLEADER": [
-   "quadratic",
-   0.0
-  ],
-  "KXNHLSERIES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXPGARYDER": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEMMYCSERIES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBRBI": [
-   "quadratic",
-   0.5
-  ],
-  "KXRTX5090WS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBKS": [
-   "quadratic",
-   0.5
-  ],
-  "KXH200MAX": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXFED": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAMBTOTAL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLMVP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXBTCMAX150": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLAFCNORTH": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXH200W": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXF1RACE": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLDROTY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXPAYROLLS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXINDY500": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNBAFINALSMVP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBHRDERBY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXGDP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLNFCCHAMP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXAOMENSINGLES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBHIT": [
-   "quadratic",
-   0.5
-  ],
-  "KXNBA": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBNL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNASCARRACE": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNBAWEST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXCLUBWC": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAFB10": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXPGA": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
   "KXNCAAFPLAYOFF": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXRTX5090W": [
+  "KXNBATOTAL": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXELECTIRAN": [
-   "quadratic",
-   0.0
-  ],
-  "KXNHLWEST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXPAHLAVIHEAD": [
-   "quadratic",
-   0.0
-  ],
-  "KXSB": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAFTOTAL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAF": [
+  "KXWMENSINGLES": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -369,75 +17,51 @@
    "quadratic_with_combo_maker_fees",
    1.0
   ],
+  "KXMLBEXTRAS": [
+   "quadratic",
+   0.5
+  ],
+  "KXNFL2TD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLDPOTY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEXPAND": [
+   "quadratic",
+   0.0
+  ],
+  "KXMVECROSSCATEGORY-SHARD1": [
+   "quadratic_with_combo_maker_fees",
+   1.0
+  ],
+  "KXMVESPORTSMULTIGAMEEXTENDED": [
+   "quadratic_with_combo_maker_fees",
+   1.0
+  ],
+  "KXAAAGASM": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAFB10": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLTOTAL": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBA": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXSB": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
   "KXH200Q": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXSERIEAGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBASGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEMMYDACTO": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXRTX5090Q": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXINXY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBF7": [
-   "quadratic",
-   0.5
-  ],
-  "KXMLBHRR": [
-   "quadratic",
-   0.5
-  ],
-  "KXNHLGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLFIRSTTD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNASDAQ100Y": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNASCARRACEOLD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXH100MON": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLCPOTY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNBACOY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBAL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXB200Q": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXB200WS": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -445,271 +69,19 @@
    "quadratic",
    0.5
   ],
-  "KXNBAGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXBTCY": [
-   "quadratic",
-   0.0
-  ],
-  "KXH200WS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXLIGUE1GAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLOPOTY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBF5": [
-   "quadratic",
-   0.5
-  ],
-  "KXNBAMVP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXRTX5090MS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXH100W": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXCONNSMYTHE": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXLIGUE1": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXBUNDESLIGAGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXA100MAX": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXIRANDEMOCRACY": [
-   "quadratic",
-   0.0
-  ],
-  "KXH200MS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXFOMEN": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLNFCEAST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBOUTS": [
-   "quadratic",
-   0.5
-  ],
-  "KXLLM1": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLOROTY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXCPI": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAFB12": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFL2TD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXA100MS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLANYTD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXTRUMPOUT": [
-   "quadratic",
-   0.0
-  ],
-  "KXRTX5090MON": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMENWORLDCUP": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBTEAMTOTAL": [
-   "quadratic",
-   0.5
-  ],
-  "KXMLBTOTAL": [
-   "quadratic",
-   0.5
-  ],
-  "KXGREENLAND": [
-   "quadratic",
-   0.0
-  ],
-  "KXIPO": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMARMAD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXBTCMAX125": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXAAAGASM": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMVESPORTSMULTIGAMEEXTENDED": [
-   "quadratic_with_combo_maker_fees",
-   1.0
-  ],
-  "KXMLBRFI": [
-   "quadratic",
-   0.5
-  ],
-  "KXNBATOTAL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLNFCNORTH": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXU3": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNATHANDOGS": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNHLEAST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXB200W": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXUCLGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNBASERIES": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNBAEAST": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBHR": [
-   "quadratic",
-   0.5
-  ],
-  "KXA100MON": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXEPLGAME": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXFEDDECISION": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNBAROY": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXRTX5090MAX": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXH100MAX": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXTHEOPEN": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNHL": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
   "KXNCAAFSEC": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXGAMBLINGREPEAL": [
-   "quadratic",
-   0.0
-  ],
-  "KXMLBSB": [
-   "quadratic",
-   0.5
-  ],
-  "KXETHY": [
-   "quadratic",
-   0.0
-  ],
-  "KXPGATOUR": [
+  "KXMLBNL": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXFOWOMEN": [
+  "KXNFLAFCWEST": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXNCAAFSPREAD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNCAAMBSPREAD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNATHANSHD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLSPREAD": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXNFLAFCSOUTH": [
-   "quadratic_with_maker_fees",
-   1.0
-  ],
-  "KXMLBSERIES": [
+  "KXNFLGAME": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -717,7 +89,27 @@
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXUSOMENSINGLES": [
+  "KXNCAAFSPREAD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAF": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXHEISMAN": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAFB12": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBASGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXRTX5090MON": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -725,11 +117,135 @@
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXBUNDESLIGA": [
+  "KXB200WS": [
    "quadratic_with_maker_fees",
    1.0
   ],
+  "KXF1RACEPODIUM": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXRTX5090W": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEMMYDACTR": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXU3": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXELECTIRAN": [
+   "quadratic",
+   0.0
+  ],
   "KXWTAMATCH": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXGDPYEAR": [
+   "quadratic",
+   0.0
+  ],
+  "KXEMMYDSERIES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBF3": [
+   "quadratic",
+   0.5
+  ],
+  "KXLLM1": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXLALIGA": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBAWEST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXTHEOPEN": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXF1RACE": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNHLEAST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXB200MON": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLSPREAD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXCPI": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXWNBAGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXRTX5090MS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMARMAD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXB200W": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXATPMATCH": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXPAYROLLS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBGAME": [
+   "quadratic_with_maker_fees",
+   0.5
+  ],
+  "KXNFLAFCNORTH": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEMMYCSERIES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXDOED": [
+   "quadratic",
+   0.0
+  ],
+  "KXB200MAX": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBASPREAD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXFOWOMEN": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXBTCMAX150": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -737,7 +253,71 @@
    "quadratic",
    0.5
   ],
+  "KXNFLCPOTY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXUSOMENSINGLES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXA100WS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXPGA": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBASERIES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXGDP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNEXTIRANLEADER": [
+   "quadratic",
+   0.0
+  ],
+  "KXMLBHRDERBY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
   "KXTOURDEFRANCE": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBRBI": [
+   "quadratic",
+   0.5
+  ],
+  "KXFEDDECISION": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXRTX5090WS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAFACC": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXPGATOUR": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNASCARRACE": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXWWOMENSINGLES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNASCARRACEOLD": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -749,7 +329,115 @@
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXNFLGAME": [
+  "KXNATHANDOGS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNHLSERIES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXA100MON": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXSERIEA": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBAROY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXFOMEN": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLNFCSOUTH": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNHLWEST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH200MS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXA100MS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXLIGUE1GAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXCPIYOY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEPLGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBOUTS": [
+   "quadratic",
+   0.5
+  ],
+  "KXPGASOLHEIM": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLAFCEAST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXGAMBLINGREPEAL": [
+   "quadratic",
+   0.0
+  ],
+  "KXUCLGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH100MON": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBF5": [
+   "quadratic",
+   0.5
+  ],
+  "KXB200Q": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXCONNSMYTHE": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLNFCNORTH": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXLIGUE1": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXA100Q": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXIPO": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXA100W": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNHL": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -757,11 +445,51 @@
    "quadratic_with_maker_fees",
    1.0
   ],
+  "KXTRUMPOUT": [
+   "quadratic",
+   0.0
+  ],
+  "KXNFLOROTY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
   "KXNFLCOTY": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXHEISMAN": [
+  "KXMLBHR": [
+   "quadratic",
+   0.5
+  ],
+  "KXEGGS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLDROTY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXETHY": [
+   "quadratic",
+   0.0
+  ],
+  "KXNBAGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBSB": [
+   "quadratic",
+   0.5
+  ],
+  "KXBTCMAX125": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXFOMENSINGLES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXUCL": [
    "quadratic_with_maker_fees",
    1.0
   ],
@@ -769,15 +497,287 @@
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXMLBGAME": [
-   "quadratic_with_maker_fees",
-   0.5
-  ],
-  "KXSERIEA": [
+  "KXNFLFIRSTTD": [
    "quadratic_with_maker_fees",
    1.0
   ],
-  "KXNBASPREAD": [
+  "KXNBAFINALSMVP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXUSOPEN": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH200WS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH100W": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLNFCWEST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNASCAR": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXINXY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXCITRINI": [
+   "quadratic",
+   0.0
+  ],
+  "KXMENWORLDCUP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBACOY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXUSOWOMENSINGLES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNHLGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBAMVP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXIRANDEMOCRACY": [
+   "quadratic",
+   0.0
+  ],
+  "KXRTX5090MAX": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXA100MAX": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXINDY500": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAFGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBKS": [
+   "quadratic",
+   0.5
+  ],
+  "KXCLUBWC": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBF7": [
+   "quadratic",
+   0.5
+  ],
+  "KXMLBTB": [
+   "quadratic",
+   0.5
+  ],
+  "KXMLBF5TOTAL": [
+   "quadratic",
+   0.5
+  ],
+  "KXUEFACL": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLAFCCHAMP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBRFI": [
+   "quadratic",
+   0.5
+  ],
+  "KXNATHANSHD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBAL": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXPGARYDER": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBHIT": [
+   "quadratic",
+   0.5
+  ],
+  "KXMLBTEAMTOTAL": [
+   "quadratic",
+   0.5
+  ],
+  "KXSERIEAGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXWNBA": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBHRR": [
+   "quadratic",
+   0.5
+  ],
+  "KXNFLOPOTY": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEMMYDACTO": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXRTX5090Q": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXSUPERBOWLHEADLINE": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXAOMENSINGLES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBTOTAL": [
+   "quadratic",
+   0.5
+  ],
+  "KXH100MS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLAFCSOUTH": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEMMYCACTO": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLANYTD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAMBSPREAD": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLNFCCHAMP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH200W": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXPAHLAVIHEAD": [
+   "quadratic",
+   0.0
+  ],
+  "KXH200MAX": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXBUNDESLIGA": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAFTOTAL": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXBTCY": [
+   "quadratic",
+   0.0
+  ],
+  "KXNASDAQ100Y": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXBUNDESLIGAGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNCAAMBTOTAL": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH200MON": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNFLMVP": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEMMYCACTR": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXEPLTOP4": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXFED": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXLAYOFFSYINFO": [
+   "quadratic",
+   0.0
+  ],
+  "KXGREENLAND": [
+   "quadratic",
+   0.0
+  ],
+  "KXNFLNFCEAST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXMLBSERIES": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXB200MS": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXBALLONDOR": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXH100MAX": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXNBAEAST": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXLALIGAGAME": [
+   "quadratic_with_maker_fees",
+   1.0
+  ],
+  "KXWCGAME": [
    "quadratic_with_maker_fees",
    1.0
   ]
