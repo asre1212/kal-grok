@@ -1,6 +1,6 @@
 {
  "paper_trading": true,
- "updated": 1795380577,
+ "updated": 1795380611,
  "last_run": 1795380557,
  "runs": 14,
  "start_bankroll": 100000.0,
@@ -23,8 +23,8 @@
   {
    "name": "event_arb",
    "description": "Mutually-exclusive outcome sets: NO baskets when YES bids sum > $1, YES baskets when exhaustive asks sum < $1.",
-   "weight": 0.1641,
-   "sleeve": 15581.42,
+   "weight": 0.1364,
+   "sleeve": 12951.28,
    "status": "active",
    "realized": 0.0,
    "unrealized": 0,
@@ -44,8 +44,8 @@
   {
    "name": "ladder_arb",
    "description": "Monotonicity violations in threshold ladders (P(>a) must be >= P(>b) for a<b).",
-   "weight": 0.1443,
-   "sleeve": 13701.39,
+   "weight": 0.1911,
+   "sleeve": 18145.09,
    "status": "active",
    "realized": 0.0,
    "unrealized": 8.01,
@@ -65,8 +65,8 @@
   {
    "name": "longshot_fade",
    "description": "Fade overpriced longshots (buy NO) / buy underpriced favorites, net of fees.",
-   "weight": 0.1348,
-   "sleeve": 12799.36,
+   "weight": 0.0934,
+   "sleeve": 8868.4,
    "status": "active",
    "realized": -1177.74,
    "unrealized": -142.62,
@@ -80,7 +80,7 @@
    "exposure": 6116.46,
    "params": {
     "min_edge": 0.015,
-    "beta": 1.12,
+    "beta": 1.05,
     "p_max": 0.2,
     "max_days": 60
    },
@@ -89,8 +89,8 @@
   {
    "name": "expiry_convergence",
    "description": "Buy near-certain favorites shortly before expiry (time-decay convergence to $1).",
-   "weight": 0.1016,
-   "sleeve": 9647.0,
+   "weight": 0.2294,
+   "sleeve": 21781.7,
    "status": "active",
    "realized": -338.6,
    "unrealized": 0,
@@ -104,7 +104,7 @@
    "exposure": 0,
    "params": {
     "min_edge": 0.0144,
-    "beta": 1.0,
+    "beta": 1.019,
     "p_min": 0.85,
     "max_hours": 48
    },
@@ -113,8 +113,8 @@
   {
    "name": "momentum",
    "description": "Momentum: follow large moves between snapshots.",
-   "weight": 0.0894,
-   "sleeve": 8488.6,
+   "weight": 0.0704,
+   "sleeve": 6684.53,
    "status": "active",
    "realized": -546.93,
    "unrealized": -1295.64,
@@ -127,7 +127,7 @@
    "open_positions": 1,
    "exposure": 1316.88,
    "params": {
-    "kappa": 0.35,
+    "kappa": 0.05,
     "min_edge": 0.03,
     "hold": 4
    },
@@ -136,8 +136,8 @@
   {
    "name": "mean_reversion",
    "description": "Mean reversion: fade large moves between snapshots.",
-   "weight": 0.084,
-   "sleeve": 7975.86,
+   "weight": 0.1438,
+   "sleeve": 13653.92,
    "status": "active",
    "realized": 1157.57,
    "unrealized": -988.57,
@@ -150,8 +150,8 @@
    "open_positions": 5,
    "exposure": 1707.99,
    "params": {
-    "kappa": -0.35,
-    "min_edge": 0.03,
+    "kappa": -0.136,
+    "min_edge": 0.027,
     "hold": 4
    },
    "note": null
@@ -159,8 +159,8 @@
   {
    "name": "market_making",
    "description": "Passive two-sided quoting on wide spreads with conservative fill model.",
-   "weight": 0.1134,
-   "sleeve": 10767.41,
+   "weight": 0.0755,
+   "sleeve": 7168.78,
    "status": "active",
    "realized": -263.34,
    "unrealized": 13.67,
@@ -182,9 +182,9 @@
   {
    "name": "weather_nws",
    "description": "Daily high-temperature buckets priced from the free NWS forecast (Normal error model).",
-   "weight": 0.1184,
-   "sleeve": 11242.17,
-   "status": "active",
+   "weight": 0.01,
+   "sleeve": 949.51,
+   "status": "probation",
    "realized": -1111.72,
    "unrealized": -433.74,
    "total": -1545.46,
@@ -196,9 +196,9 @@
    "open_positions": 2,
    "exposure": 442.14,
    "params": {
-    "sigma_scale": 1.0,
-    "min_edge": 0.05,
-    "model_weight": 0.35
+    "sigma_scale": 1.1,
+    "min_edge": 0.06,
+    "model_weight": 0.3
    },
    "note": "24 city-days evaluated, 0 trades"
   }
@@ -279,13 +279,13 @@
   }
  },
  "calibration": {
-  "alpha": 0.0,
-  "beta_long": 1.12,
-  "n_long": 0,
-  "alpha_short": -0.0367,
-  "beta_short": 0.977,
-  "n_short": 1582,
-  "ts": 1794772648,
+  "alpha": -0.2303,
+  "beta_long": 1.0498,
+  "n_long": 124,
+  "alpha_short": 0.0134,
+  "beta_short": 1.0194,
+  "n_short": 4040,
+  "ts": 1795380611,
   "samples": 4164
  },
  "cash_apy_assumption": 0.035,

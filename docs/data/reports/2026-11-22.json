@@ -1,0 +1,821 @@
+{
+ "date": "2026-11-22",
+ "generated": 1795380611,
+ "equity_start": 96819.18,
+ "equity_end": 94950.75,
+ "week_pnl": -1868.43,
+ "week_return_pct": -1.93,
+ "total_return_pct": -5.049,
+ "max_drawdown_week": 0.0445,
+ "metrics": {
+  "event_arb": {
+   "week_pnl": 0.0,
+   "week_return": 0.0,
+   "total_pnl": 0.0,
+   "sharpe": null,
+   "sortino": null,
+   "max_drawdown": 0.0,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "ladder_arb": {
+   "week_pnl": 5.7,
+   "week_return": 0.00041,
+   "total_pnl": 8.01,
+   "sharpe": 5.011,
+   "sortino": 12.917,
+   "max_drawdown": 0.001,
+   "closed_trades": 0,
+   "closed_all": 0,
+   "hit_rate": null,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 0,
+   "losses_recent": 0
+  },
+  "longshot_fade": {
+   "week_pnl": -1202.7,
+   "week_return": -0.09193,
+   "total_pnl": -1320.36,
+   "sharpe": -15.087,
+   "sortino": -13.348,
+   "max_drawdown": 0.0967,
+   "closed_trades": 2,
+   "closed_all": 2,
+   "hit_rate": 0.0,
+   "settled_trades": 2,
+   "brier": 0.7062,
+   "calibration_gap": 0.8403,
+   "brier_market": 0.6642,
+   "wins_recent": 0,
+   "losses_recent": 2
+  },
+  "expiry_convergence": {
+   "week_pnl": 2304.74,
+   "week_return": 0.23373,
+   "total_pnl": -338.6,
+   "sharpe": 0.16,
+   "sortino": 0.221,
+   "max_drawdown": 0.1671,
+   "closed_trades": 16,
+   "closed_all": 28,
+   "hit_rate": 1.0,
+   "settled_trades": 28,
+   "brier": 0.0967,
+   "calibration_gap": 0.0194,
+   "brier_market": 0.0978,
+   "wins_recent": 25,
+   "losses_recent": 3
+  },
+  "momentum": {
+   "week_pnl": -1842.57,
+   "week_return": -0.21236,
+   "total_pnl": -1842.57,
+   "sharpe": -10.882,
+   "sortino": -10.264,
+   "max_drawdown": 0.2644,
+   "closed_trades": 3,
+   "closed_all": 3,
+   "hit_rate": 0.0,
+   "settled_trades": 1,
+   "brier": 0.0365,
+   "calibration_gap": 0.191,
+   "brier_market": 0.0016,
+   "wins_recent": 0,
+   "losses_recent": 3
+  },
+  "mean_reversion": {
+   "week_pnl": 169.0,
+   "week_return": 0.02073,
+   "total_pnl": 169.0,
+   "sharpe": 1.215,
+   "sortino": 2.22,
+   "max_drawdown": 0.0947,
+   "closed_trades": 9,
+   "closed_all": 9,
+   "hit_rate": 0.444,
+   "settled_trades": 3,
+   "brier": 0.0247,
+   "calibration_gap": 0.1548,
+   "brier_market": 0.008,
+   "wins_recent": 4,
+   "losses_recent": 5
+  },
+  "market_making": {
+   "week_pnl": -170.81,
+   "week_return": -0.01552,
+   "total_pnl": -249.67,
+   "sharpe": -13.862,
+   "sortino": -12.436,
+   "max_drawdown": 0.021,
+   "closed_trades": 18,
+   "closed_all": 20,
+   "hit_rate": 0.222,
+   "settled_trades": 0,
+   "brier": null,
+   "calibration_gap": null,
+   "brier_market": null,
+   "wins_recent": 5,
+   "losses_recent": 15
+  },
+  "weather_nws": {
+   "week_pnl": -1197.65,
+   "week_return": -0.10423,
+   "total_pnl": -1545.46,
+   "sharpe": -5.798,
+   "sortino": -5.942,
+   "max_drawdown": 0.1036,
+   "closed_trades": 39,
+   "closed_all": 39,
+   "hit_rate": 0.179,
+   "settled_trades": 39,
+   "brier": 0.1621,
+   "calibration_gap": 0.1757,
+   "brier_market": 0.1378,
+   "wins_recent": 7,
+   "losses_recent": 32
+  }
+ },
+ "scores": {
+  "event_arb": 0.0,
+  "ladder_arb": 0.308,
+  "longshot_fade": -1.0,
+  "expiry_convergence": 1.0,
+  "momentum": -1.0,
+  "mean_reversion": 0.514,
+  "market_making": -0.601,
+  "weather_nws": -1.0
+ },
+ "allocation_old": {
+  "event_arb": 0.1641,
+  "ladder_arb": 0.1443,
+  "longshot_fade": 0.1348,
+  "expiry_convergence": 0.1016,
+  "momentum": 0.0894,
+  "mean_reversion": 0.084,
+  "market_making": 0.1134,
+  "weather_nws": 0.1184
+ },
+ "allocation_new": {
+  "weather_nws": 0.01,
+  "event_arb": 0.1364,
+  "ladder_arb": 0.1911,
+  "longshot_fade": 0.0934,
+  "expiry_convergence": 0.2294,
+  "momentum": 0.0704,
+  "mean_reversion": 0.1438,
+  "market_making": 0.0755
+ },
+ "status": {
+  "event_arb": "active",
+  "ladder_arb": "active",
+  "longshot_fade": "active",
+  "expiry_convergence": "active",
+  "momentum": "active",
+  "mean_reversion": "active",
+  "market_making": "active",
+  "weather_nws": "probation"
+ },
+ "param_changes": {
+  "event_arb": {
+   "old": {
+    "min_profit": 0.01
+   },
+   "new": {
+    "min_profit": 0.01
+   },
+   "reasons": []
+  },
+  "ladder_arb": {
+   "old": {
+    "min_profit": 0.01
+   },
+   "new": {
+    "min_profit": 0.01
+   },
+   "reasons": []
+  },
+  "longshot_fade": {
+   "old": {
+    "min_edge": 0.015,
+    "beta": 1.12,
+    "p_max": 0.2,
+    "max_days": 60
+   },
+   "new": {
+    "min_edge": 0.015,
+    "beta": 1.05,
+    "p_max": 0.2,
+    "max_days": 60
+   },
+   "reasons": [
+    "min_edge: unchanged (only 2 closed trades)",
+    "beta 1.12 -> 1.05: refit on 124 settled markets (alpha=-0.230)"
+   ]
+  },
+  "expiry_convergence": {
+   "old": {
+    "min_edge": 0.0144,
+    "beta": 1.0,
+    "p_min": 0.85,
+    "max_hours": 48
+   },
+   "new": {
+    "min_edge": 0.0144,
+    "beta": 1.019,
+    "p_min": 0.85,
+    "max_hours": 48
+   },
+   "reasons": [
+    "beta 1.0 -> 1.019: refit on 4040 short-horizon settlements (alpha=0.013)"
+   ]
+  },
+  "momentum": {
+   "old": {
+    "kappa": 0.35,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "new": {
+    "kappa": 0.05,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "reasons": [
+    "min_edge: unchanged (only 3 closed trades)",
+    "kappa 0.35 -> 0.05: pooled lag-1 autocorr of price changes = -0.136"
+   ]
+  },
+  "mean_reversion": {
+   "old": {
+    "kappa": -0.35,
+    "min_edge": 0.03,
+    "hold": 4
+   },
+   "new": {
+    "kappa": -0.136,
+    "min_edge": 0.027,
+    "hold": 4
+   },
+   "reasons": [
+    "min_edge 0.03 -> 0.027: profitable (Sharpe 1.22), loosen to trade more",
+    "kappa -0.35 -> -0.136: pooled lag-1 autocorr of price changes = -0.136"
+   ]
+  },
+  "market_making": {
+   "old": {
+    "min_spread": 0.06,
+    "fill_frac": 0.1,
+    "quote_qty": 100
+   },
+   "new": {
+    "min_spread": 0.06,
+    "fill_frac": 0.1,
+    "quote_qty": 100
+   },
+   "reasons": []
+  },
+  "weather_nws": {
+   "old": {
+    "sigma_scale": 1.0,
+    "min_edge": 0.05,
+    "model_weight": 0.35
+   },
+   "new": {
+    "sigma_scale": 1.1,
+    "min_edge": 0.06,
+    "model_weight": 0.3
+   },
+   "reasons": [
+    "min_edge 0.05 -> 0.06: losing week, demand more edge",
+    "sigma_scale -> 1.1: overconfident by 0.18",
+    "model_weight -> 0.3: market Brier 0.138 beat forecast 0.162"
+   ]
+  }
+ },
+ "calibration_fit": {
+  "alpha": -0.2303,
+  "beta_long": 1.0498,
+  "n_long": 124,
+  "alpha_short": 0.0134,
+  "beta_short": 1.0194,
+  "n_short": 4040,
+  "ts": 1795380611
+ },
+ "autocorr": -0.13576859704019467,
+ "changes": [
+  "**weather_nws** status active -> probation: two straight losing weeks and cumulative loss > 8% of sleeve",
+  "**event_arb** allocation 16.4% -> 13.6% (score +0.00, week P&L $+0.00)",
+  "**ladder_arb** allocation 14.4% -> 19.1% (score +0.31, week P&L $+5.70)",
+  "**longshot_fade** allocation 13.5% -> 9.3% (score -1.00, week P&L $-1,202.70)",
+  "**expiry_convergence** allocation 10.2% -> 22.9% (score +1.00, week P&L $+2,304.74)",
+  "**momentum** allocation 8.9% -> 7.0% (score -1.00, week P&L $-1,842.57)",
+  "**mean_reversion** allocation 8.4% -> 14.4% (score +0.51, week P&L $+169.00)",
+  "**market_making** allocation 11.3% -> 7.5% (score -0.60, week P&L $-170.81)",
+  "**weather_nws** allocation 11.8% -> 1.0% (score -1.00, week P&L $-1,197.65)",
+  "**longshot_fade** beta: 1.12 -> 1.05",
+  "**expiry_convergence** beta: 1.0 -> 1.019",
+  "**momentum** kappa: 0.35 -> 0.05",
+  "**mean_reversion** kappa: -0.35 -> -0.136",
+  "**mean_reversion** min_edge: 0.03 -> 0.027",
+  "**weather_nws** sigma_scale: 1.0 -> 1.1",
+  "**weather_nws** min_edge: 0.05 -> 0.06",
+  "**weather_nws** model_weight: 0.35 -> 0.3"
+ ],
+ "combos": {
+  "ranking": [
+   {
+    "id": "1d|tp10",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+10%",
+    "net_return_pct": -6.043,
+    "gross_return_pct": -5.779,
+    "fees": 263.64,
+    "fees_saved": 498.1,
+    "fill_rate": 0.05,
+    "trades": 172,
+    "closed": 125,
+    "win_rate": 0.36,
+    "max_dd_pct": 6.554,
+    "sharpe": -7.02,
+    "adequate": true
+   },
+   {
+    "id": "1d|tp25",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+25%",
+    "net_return_pct": -6.043,
+    "gross_return_pct": -5.779,
+    "fees": 263.64,
+    "fees_saved": 498.1,
+    "fill_rate": 0.05,
+    "trades": 172,
+    "closed": 125,
+    "win_rate": 0.36,
+    "max_dd_pct": 6.554,
+    "sharpe": -7.02,
+    "adequate": true
+   },
+   {
+    "id": "1d|hold",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -6.073,
+    "gross_return_pct": -5.811,
+    "fees": 262.68,
+    "fees_saved": 498.03,
+    "fill_rate": 0.05,
+    "trades": 171,
+    "closed": 125,
+    "win_rate": 0.352,
+    "max_dd_pct": 6.584,
+    "sharpe": -7.08,
+    "adequate": true
+   },
+   {
+    "id": "1d|tp50",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+50%",
+    "net_return_pct": -6.075,
+    "gross_return_pct": -5.812,
+    "fees": 262.78,
+    "fees_saved": 498.03,
+    "fill_rate": 0.05,
+    "trades": 171,
+    "closed": 126,
+    "win_rate": 0.357,
+    "max_dd_pct": 6.585,
+    "sharpe": -7.08,
+    "adequate": true
+   },
+   {
+    "id": "1d|tp100",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+100%",
+    "net_return_pct": -6.073,
+    "gross_return_pct": -5.811,
+    "fees": 262.68,
+    "fees_saved": 498.03,
+    "fill_rate": 0.05,
+    "trades": 171,
+    "closed": 125,
+    "win_rate": 0.352,
+    "max_dd_pct": 6.584,
+    "sharpe": -7.08,
+    "adequate": true
+   },
+   {
+    "id": "1d|tp25sl25",
+    "bucket_label": "\u22641 day (<48h)",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -6.138,
+    "gross_return_pct": -5.868,
+    "fees": 270.05,
+    "fees_saved": 498.0,
+    "fill_rate": 0.05,
+    "trades": 170,
+    "closed": 126,
+    "win_rate": 0.349,
+    "max_dd_pct": 6.649,
+    "sharpe": -7.09,
+    "adequate": true
+   },
+   {
+    "id": "6m+|hold",
+    "bucket_label": ">6 months",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -0.199,
+    "gross_return_pct": -0.199,
+    "fees": 0.0,
+    "fees_saved": 67.01,
+    "fill_rate": 0.072,
+    "trades": 70,
+    "closed": 53,
+    "win_rate": 0.509,
+    "max_dd_pct": 0.236,
+    "sharpe": -7.15,
+    "adequate": true
+   },
+   {
+    "id": "6m+|tp50",
+    "bucket_label": ">6 months",
+    "rule_label": "+50%",
+    "net_return_pct": -0.199,
+    "gross_return_pct": -0.199,
+    "fees": 0.0,
+    "fees_saved": 67.01,
+    "fill_rate": 0.071,
+    "trades": 70,
+    "closed": 53,
+    "win_rate": 0.509,
+    "max_dd_pct": 0.236,
+    "sharpe": -7.15,
+    "adequate": true
+   },
+   {
+    "id": "6m+|tp100",
+    "bucket_label": ">6 months",
+    "rule_label": "+100%",
+    "net_return_pct": -0.199,
+    "gross_return_pct": -0.199,
+    "fees": 0.0,
+    "fees_saved": 67.01,
+    "fill_rate": 0.071,
+    "trades": 70,
+    "closed": 53,
+    "win_rate": 0.509,
+    "max_dd_pct": 0.236,
+    "sharpe": -7.15,
+    "adequate": true
+   },
+   {
+    "id": "6m+|tp25",
+    "bucket_label": ">6 months",
+    "rule_label": "+25%",
+    "net_return_pct": -0.231,
+    "gross_return_pct": -0.229,
+    "fees": 2.02,
+    "fees_saved": 67.01,
+    "fill_rate": 0.072,
+    "trades": 70,
+    "closed": 54,
+    "win_rate": 0.519,
+    "max_dd_pct": 0.269,
+    "sharpe": -8.39,
+    "adequate": true
+   },
+   {
+    "id": "6m+|tp10",
+    "bucket_label": ">6 months",
+    "rule_label": "+10%",
+    "net_return_pct": -0.233,
+    "gross_return_pct": -0.23,
+    "fees": 3.51,
+    "fees_saved": 65.41,
+    "fill_rate": 0.072,
+    "trades": 67,
+    "closed": 54,
+    "win_rate": 0.537,
+    "max_dd_pct": 0.269,
+    "sharpe": -8.41,
+    "adequate": true
+   },
+   {
+    "id": "1m|tp25sl25",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -8.017,
+    "gross_return_pct": -7.887,
+    "fees": 129.5,
+    "fees_saved": 490.63,
+    "fill_rate": 0.146,
+    "trades": 129,
+    "closed": 88,
+    "win_rate": 0.295,
+    "max_dd_pct": 8.342,
+    "sharpe": -9.65,
+    "adequate": true
+   },
+   {
+    "id": "1m|hold",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -8.417,
+    "gross_return_pct": -8.319,
+    "fees": 98.13,
+    "fees_saved": 476.42,
+    "fill_rate": 0.14,
+    "trades": 130,
+    "closed": 77,
+    "win_rate": 0.364,
+    "max_dd_pct": 8.78,
+    "sharpe": -10.9,
+    "adequate": true
+   },
+   {
+    "id": "1m|tp100",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+100%",
+    "net_return_pct": -8.905,
+    "gross_return_pct": -8.822,
+    "fees": 82.96,
+    "fees_saved": 477.46,
+    "fill_rate": 0.14,
+    "trades": 130,
+    "closed": 75,
+    "win_rate": 0.373,
+    "max_dd_pct": 9.158,
+    "sharpe": -10.9,
+    "adequate": true
+   },
+   {
+    "id": "1m|tp25",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+25%",
+    "net_return_pct": -9.291,
+    "gross_return_pct": -9.244,
+    "fees": 46.78,
+    "fees_saved": 493.14,
+    "fill_rate": 0.146,
+    "trades": 130,
+    "closed": 75,
+    "win_rate": 0.387,
+    "max_dd_pct": 9.4,
+    "sharpe": -11.45,
+    "adequate": true
+   },
+   {
+    "id": "1m|tp50",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+50%",
+    "net_return_pct": -9.29,
+    "gross_return_pct": -9.243,
+    "fees": 46.69,
+    "fees_saved": 493.14,
+    "fill_rate": 0.146,
+    "trades": 130,
+    "closed": 75,
+    "win_rate": 0.387,
+    "max_dd_pct": 9.399,
+    "sharpe": -11.45,
+    "adequate": true
+   },
+   {
+    "id": "1m|tp10",
+    "bucket_label": "2\u201331 days",
+    "rule_label": "+10%",
+    "net_return_pct": -9.551,
+    "gross_return_pct": -9.495,
+    "fees": 56.1,
+    "fees_saved": 499.42,
+    "fill_rate": 0.148,
+    "trades": 130,
+    "closed": 80,
+    "win_rate": 0.425,
+    "max_dd_pct": 9.645,
+    "sharpe": -11.69,
+    "adequate": true
+   },
+   {
+    "id": "6m+|tp25sl25",
+    "bucket_label": ">6 months",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -0.473,
+    "gross_return_pct": -0.46,
+    "fees": 12.94,
+    "fees_saved": 65.45,
+    "fill_rate": 0.085,
+    "trades": 66,
+    "closed": 60,
+    "win_rate": 0.333,
+    "max_dd_pct": 0.485,
+    "sharpe": -16.43,
+    "adequate": true
+   },
+   {
+    "id": "6m|tp25sl25",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+25% / \u221225% SL",
+    "net_return_pct": -1.703,
+    "gross_return_pct": -1.606,
+    "fees": 97.93,
+    "fees_saved": 290.49,
+    "fill_rate": 0.25,
+    "trades": 142,
+    "closed": 85,
+    "win_rate": 0.306,
+    "max_dd_pct": 1.789,
+    "sharpe": -22.63,
+    "adequate": true
+   },
+   {
+    "id": "6m|tp10",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+10%",
+    "net_return_pct": -1.702,
+    "gross_return_pct": -1.662,
+    "fees": 39.74,
+    "fees_saved": 285.96,
+    "fill_rate": 0.238,
+    "trades": 146,
+    "closed": 71,
+    "win_rate": 0.521,
+    "max_dd_pct": 1.702,
+    "sharpe": -28.85,
+    "adequate": true
+   },
+   {
+    "id": "6m|tp25",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+25%",
+    "net_return_pct": -1.698,
+    "gross_return_pct": -1.664,
+    "fees": 33.53,
+    "fees_saved": 283.23,
+    "fill_rate": 0.237,
+    "trades": 145,
+    "closed": 67,
+    "win_rate": 0.463,
+    "max_dd_pct": 1.698,
+    "sharpe": -28.95,
+    "adequate": true
+   },
+   {
+    "id": "6m|tp50",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+50%",
+    "net_return_pct": -1.698,
+    "gross_return_pct": -1.664,
+    "fees": 33.53,
+    "fees_saved": 283.23,
+    "fill_rate": 0.237,
+    "trades": 145,
+    "closed": 67,
+    "win_rate": 0.463,
+    "max_dd_pct": 1.698,
+    "sharpe": -28.95,
+    "adequate": true
+   },
+   {
+    "id": "6m|hold",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "Hold to settle",
+    "net_return_pct": -1.714,
+    "gross_return_pct": -1.684,
+    "fees": 30.58,
+    "fees_saved": 292.63,
+    "fill_rate": 0.239,
+    "trades": 150,
+    "closed": 75,
+    "win_rate": 0.453,
+    "max_dd_pct": 1.714,
+    "sharpe": -29.25,
+    "adequate": true
+   },
+   {
+    "id": "6m|tp100",
+    "bucket_label": "32\u2013183 days",
+    "rule_label": "+100%",
+    "net_return_pct": -1.73,
+    "gross_return_pct": -1.698,
+    "fees": 32.05,
+    "fees_saved": 291.06,
+    "fill_rate": 0.238,
+    "trades": 150,
+    "closed": 74,
+    "win_rate": 0.459,
+    "max_dd_pct": 1.73,
+    "sharpe": -29.83,
+    "adequate": true
+   }
+  ],
+  "main": {
+   "net_return_pct": -5.049,
+   "gross_return_pct": -4.609,
+   "fees": 440.57,
+   "sharpe": -6.73,
+   "max_dd_pct": 5.049,
+   "closed": 101
+  },
+  "top": "1d|tp10",
+  "adopted": [],
+  "not_adopted_because": [
+   "sample too small",
+   "Sharpe edge < 0.5",
+   "net return edge < 1.0 pts"
+  ],
+  "main_rules": {
+   "tp": null,
+   "sl": null,
+   "bucket_weights": {
+    "1d": 1.0,
+    "1m": 1.0,
+    "6m": 1.0,
+    "6m+": 1.0
+   },
+   "min_pop": 0.65,
+   "pop_since": 1795022789
+  },
+  "pop_books": [
+   {
+    "label": "All trades (no POP filter)",
+    "min_pop": null,
+    "net_return_pct": -10.872,
+    "fees": 0.27,
+    "trades": 118,
+    "closed": 40,
+    "win_rate": 0.25,
+    "max_dd_pct": 10.872,
+    "sharpe": null,
+    "calibration": {
+     "n": 26,
+     "avg_pop": 0.336,
+     "hit_rate": 0.1923
+    }
+   },
+   {
+    "label": "POP \u2265 0.60",
+    "min_pop": 0.6,
+    "net_return_pct": -2.908,
+    "fees": 0.27,
+    "trades": 14,
+    "closed": 2,
+    "win_rate": 0.0,
+    "max_dd_pct": 2.908,
+    "sharpe": null,
+    "calibration": {
+     "n": 2,
+     "avg_pop": 0.6681,
+     "hit_rate": 0.0
+    }
+   },
+   {
+    "label": "POP \u2265 0.70",
+    "min_pop": 0.7,
+    "net_return_pct": -0.447,
+    "fees": 0.27,
+    "trades": 5,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.476,
+    "sharpe": null,
+    "calibration": {
+     "n": 0,
+     "avg_pop": null,
+     "hit_rate": null
+    }
+   },
+   {
+    "label": "POP \u2265 0.80",
+    "min_pop": 0.8,
+    "net_return_pct": -0.061,
+    "fees": 0.27,
+    "trades": 3,
+    "closed": 0,
+    "win_rate": null,
+    "max_dd_pct": 0.09,
+    "sharpe": null,
+    "calibration": {
+     "n": 0,
+     "avg_pop": null,
+     "hit_rate": null
+    }
+   }
+  ],
+  "min_pop": 0.65,
+  "min_pop_changes": [],
+  "min_pop_unchanged_because": [
+   "POP \u2265 0.70: sample too small",
+   "POP \u2265 0.60: sample too small"
+  ]
+ }
+}
